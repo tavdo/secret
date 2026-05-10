@@ -1,0 +1,236 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Modal } from './Modal.jsx';
+import { RichTextBioEditor } from './RichTextBioEditor.jsx';
+import { DraggableGallery } from './DraggableGallery.jsx';
+import { MediaUploader } from './MediaUploader.jsx';
+import { useAdminData } from '../context/AdminDataContext.jsx';
+import { useAdminToast } from '../context/ToastContext.jsx';
+
+const defaults = () => ({
+  displayName: '',
+  handle: '',
+  age: 26,
+  city: '',
+  bio: '<p>Edit this biography.</p>',
+  hourlyRate: 750,
+  vip: false,
+  available: true,
+  hidden: false,
+  featured: false,
+  avatar: '',
+  gallery: [],
+});
+
+function sliceFromEditing(editing) {
+  if (!editing) return defaults();
+  return {
+    displayName: editing.displayName,
+    handle: editing.handle,
+    age: editing.age,
+    city: editing.city,
+    bio: editing.bio,
+    hourlyRate: editing.hourlyRate,
+    vip: editing.vip,
+    available: editing.available,
+    hidden: editing.hidden,
+    featured: editing.featured,
+    avatar: editing.avatar ?? '',
+    gallery: [...(editing.gallery ?? [])],
+  };
+}
+
+export function ProfileFormModal({ open, onClose, editing }) {
+  const isEdit = Boolean(editing);
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      size="xl"
+      title={isEdit ? 'Architect showcase' : 'Mint showcase'}
+      subtitle="Premium marketplace fields — hydrate via adminApi later."
+    >
+      {open ? (
+        <ProfileFormBody key={editing?.id ?? 'create'} editing={editing} onClose={onClose} />
+      ) : null}
+    </Modal>
+  );
+}
+
+function ProfileFormBody({ editing, onClose }) {
+  const isEdit = Boolean(editing);
+  const [form, setForm] = useState(() => sliceFromEditing(editing));
+  const { addProfile, updateProfile, addMedia } = useAdminData();
+  const { toast } = useAdminToast();
+
+  const set = (patch) => setForm((f) => ({ ...f, ...patch }));
+
+  const save = () => {
+    if (!form.displayName.trim()) {
+      toast({ title: 'Name required', variant: 'danger' });
+      return;
+    }
+    if (isEdit) {
+      const before = new Set(editing.gallery || []);
+      updateProfile(editing.id, form);
+      (form.gallery || []).forEach((u) => {
+        if (!before.has(u))
+          addMedia({ url: u, profileId: editing.id, label: `${form.displayName} carousel` });
+      });
+      toast({ title: 'Showcase rewired', variant: 'success' });
+    } else {
+      const nid = addProfile(form);
+      (form.gallery || []).forEach((u) =>
+        addMedia({ url: u, profileId: nid, label: `${form.displayName} carousel` })
+      );
+      toast({ title: 'Minted listing', variant: 'success' });
+    }
+    onClose?.();
+  };
+
+  const attachImage = (url) => {
+    if (!url) return;
+    setForm((prev) => ({
+      ...prev,
+      avatar: prev.avatar || url,
+      gallery: [...prev.gallery, url],
+    }));
+  };
+
+  return (
+    <>
+      <div className="grid gap-8 lg:grid-cols-[1.1fr_minmax(0,0.95fr)]">
+        <div className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Display name">
+              <input
+                className={inputCls}
+                value={form.displayName}
+                onChange={(e) => set({ displayName: e.target.value })}
+              />
+            </Field>
+            <Field label="Handle">
+              <input
+                className={inputCls}
+                placeholder="@handle"
+                value={form.handle}
+                onChange={(e) => set({ handle: e.target.value })}
+              />
+            </Field>
+            <Field label="Age">
+              <input
+                type="number"
+                min={18}
+                className={inputCls}
+                value={form.age}
+                onChange={(e) => set({ age: Number(e.target.value) || 18 })}
+              />
+            </Field>
+            <Field label="Metro">
+              <input
+                className={inputCls}
+                value={form.city}
+                onChange={(e) => set({ city: e.target.value })}
+              />
+            </Field>
+          </div>
+          <Field label="Hourly rate (USD)">
+            <input
+              type="number"
+              step={50}
+              className={inputCls}
+              value={form.hourlyRate}
+              onChange={(e) => set({ hourlyRate: Number(e.target.value) || 0 })}
+            />
+          </Field>
+
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
+            <Toggle label="VIP luminous" checked={form.vip} onChange={(v) => set({ vip: v })} />
+            <Toggle label="Available online" checked={form.available} onChange={(v) => set({ available: v })} />
+            <Toggle label="Hide listing" checked={form.hidden} onChange={(v) => set({ hidden: v })} />
+            <Toggle label="Feature homepage" checked={form.featured} onChange={(v) => set({ featured: v })} />
+          </div>
+
+          <Field label="Biography (rich text CMS)">
+            <RichTextBioEditor value={form.bio} onChange={(html) => set({ bio: html })} />
+          </Field>
+        </div>
+
+        <div className="space-y-4">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-zinc-500">Portrait & carousel</p>
+          <MediaUploader compact onUploaded={attachImage} />
+          {form.avatar ? (
+            <div className="rounded-xl overflow-hidden border border-white/10 max-h-52">
+              <img src={form.avatar} alt="" className="w-full object-cover max-h-52" />
+            </div>
+          ) : null}
+          <p className="text-xs text-zinc-500">Drag tiles to reorder. First upload becomes hero if portrait empty.</p>
+          <DraggableGallery
+            urls={form.gallery}
+            onReorder={(from, to) => {
+              setForm((prev) => {
+                const g = [...prev.gallery];
+                const [mv] = g.splice(from, 1);
+                g.splice(to, 0, mv);
+                return { ...prev, gallery: g };
+              });
+            }}
+            onRemove={(idx) => {
+              setForm((prev) => ({
+                ...prev,
+                gallery: prev.gallery.filter((_, i) => i !== idx),
+              }));
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="mt-10 flex flex-wrap justify-end gap-3 border-t border-white/10 pt-6">
+        <motion.button
+          type="button"
+          whileTap={{ scale: 0.98 }}
+          onClick={onClose}
+          className="rounded-xl border border-white/12 px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-zinc-400 hover:text-white"
+        >
+          Abort
+        </motion.button>
+        <motion.button
+          type="button"
+          whileTap={{ scale: 0.98 }}
+          onClick={save}
+          className="rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/90 to-yellow-700/85 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.22em] text-black"
+        >
+          Commit lattice
+        </motion.button>
+      </div>
+    </>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <label className="block space-y-1.5">
+      <span className="text-[10px] uppercase tracking-[0.28em] text-zinc-500">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function Toggle({ label, checked, onChange }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange?.(!checked)}
+      className={`flex-1 min-w-[140px] rounded-xl border px-3 py-2 text-left text-[11px] uppercase tracking-[0.15em] transition-colors ${
+        checked ? 'border-amber-400/45 bg-amber-500/10 text-amber-50' : 'border-white/10 text-zinc-500'
+      }`}
+    >
+      {label}
+      <span className="float-right">{checked ? 'ON' : 'OFF'}</span>
+    </button>
+  );
+}
+
+const inputCls =
+  'w-full rounded-xl border border-white/10 bg-black/45 px-3 py-2 text-sm outline-none focus:border-amber-400/40';

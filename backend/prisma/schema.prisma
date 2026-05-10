@@ -1,0 +1,359 @@
+// PostgreSQL schema for a verified provider marketplace (CLIENT / PROVIDER / ADMIN roles)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  PROVIDER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum AvailabilityStatus {
+  OFFLINE
+  AVAILABLE
+  BUSY
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+enum ReportStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum NotificationType {
+  BOOKING_CREATED
+  BOOKING_UPDATED
+  MESSAGE_RECEIVED
+  VIP_SUBSCRIPTION
+  MODERATION
+  SYSTEM
+}
+
+model User {
+  id                 String           @id @default(cuid())
+  email              String           @unique
+  passwordHash       String
+  role               Role             @default(USER)
+  accountStatus      AccountStatus    @default(ACTIVE)
+  emailVerified      Boolean          @default(false)
+  failedLoginAttempts Int             @default(0)
+  lockoutUntil       DateTime?
+  lastLoginAt        DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  profile               Profile?
+  refreshTokens       RefreshToken[]
+  emailVerification   EmailVerificationToken?
+  passwordReset       PasswordResetToken?
+  bookingsAsClient    Booking[]               @relation("ClientBookings")
+  bookingsAsProvider  Booking[]               @relation("ProviderBookings")
+  reviewsWritten      Review[]                @relation("ReviewerReviews")
+  favorites           Favorite[]              @relation("UserFavorites")
+  notifications       Notification[]
+  reportsFiled        Report[]                @relation("ReportsFiled")
+  reportsAgainst      Report[]                @relation("ReportsAgainst")
+
+  chatRoomsAsA ChatRoom[] @relation("ParticipantA")
+  chatRoomsAsB ChatRoom[] @relation("ParticipantB")
+  messagesSent Message[]
+
+  @@index([email])
+  @@index([role])
+  @@index([accountStatus])
+}
+
+model Profile {
+  id                  String               @id @default(cuid())
+  userId              String               @unique
+  displayName         String
+  slug                String               @unique
+  bio                 String               @db.Text
+  city                String
+  avatarUrl           String?
+  avatarPublicId      String?
+
+  verificationStatus  VerificationStatus   @default(UNVERIFIED)
+  vipBadge            Boolean              @default(false)
+  avgRating           Decimal              @default(0) @db.Decimal(3, 2)
+  reviewCount         Int                  @default(0)
+
+  priceMin            Int?
+  priceMax            Int?
+  currency            String?              @default("USD")
+
+  servicesText        String?              @db.Text
+
+  availability        AvailabilityStatus   @default(OFFLINE)
+  lastActiveAt        DateTime?
+
+  active              Boolean              @default(true)
+  moderatedNote       String?              @db.Text
+  moderatedAt         DateTime?
+  moderatedByUserId String?
+
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categories   ProfileCategory[]
+  galleryItems GalleryItem[]
+  favorites    Favorite[]        @relation("ProfileFavorites")
+  reviews      Review[]          @relation("ProfileReviews")
+
+  vipSubscriptions VipSubscription[]
+
+  @@index([city])
+  @@index([verificationStatus])
+  @@index([vipBadge])
+  @@index([availability])
+  @@index([avgRating(sort: Desc)])
+  @@index([lastActiveAt(sort: Desc)])
+  @@index([priceMin])
+  @@index([priceMax])
+}
+
+model Category {
+  id        String             @id @default(cuid())
+  name      String             @unique
+  slug      String             @unique
+  profiles  ProfileCategory[]
+
+  @@index([slug])
+}
+
+model ProfileCategory {
+  profileId  String
+  categoryId String
+  profile    Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, categoryId])
+  @@index([categoryId])
+}
+
+model GalleryItem {
+  id          String   @id @default(cuid())
+  profileId   String
+  url         String
+  publicId    String
+  vipLocked   Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  mimeType    String
+  bytes       Int
+  createdAt   DateTime @default(now())
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+model Favorite {
+  id        String @id @default(cuid())
+  userId    String
+  profileId String
+
+  user    User    @relation("UserFavorites", fields: [userId], references: [id], onDelete: Cascade)
+  profile Profile @relation("ProfileFavorites", fields: [profileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, profileId])
+  @@index([profileId])
+}
+
+model Booking {
+  id         String        @id @default(cuid())
+  clientId   String
+  providerId String
+
+  startsAt DateTime
+  endsAt   DateTime
+  status   BookingStatus  @default(PENDING)
+  note     String?        @db.Text
+
+  client   User @relation("ClientBookings", fields: [clientId], references: [id], onDelete: Cascade)
+  provider User @relation("ProviderBookings", fields: [providerId], references: [id], onDelete: Cascade)
+
+  reviews Review[]
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([providerId])
+  @@index([status])
+  @@index([startsAt])
+}
+
+model Review {
+  id        String @id @default(cuid())
+  bookingId String @unique
+  reviewerId String
+  profileId String
+
+  rating  Int
+  comment String? @db.Text
+
+  reviewer User @relation("ReviewerReviews", fields: [reviewerId], references: [id], onDelete: Cascade)
+  profile  Profile @relation("ProfileReviews", fields: [profileId], references: [id], onDelete: Cascade)
+  booking  Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([profileId])
+  @@index([rating])
+}
+
+model ChatRoom {
+  id      String @id @default(cuid())
+  userAId String
+  userBId String
+
+  userA User @relation("ParticipantA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB User @relation("ParticipantB", fields: [userBId], references: [id], onDelete: Cascade)
+
+  lastMessageAt DateTime?
+  messages      Message[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([userAId, userBId])
+  @@index([lastMessageAt(sort: Desc)])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  roomId    String
+  senderId  String
+  body      String   @db.Text
+  mediaUrl  String?
+  seenAt    DateTime?
+  createdAt DateTime @default(now())
+
+  room   ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([createdAt(sort: Desc)])
+}
+
+model Notification {
+  id       String           @id @default(cuid())
+  userId   String
+  type     NotificationType
+  title    String
+  body     String           @db.Text
+  meta     Json?
+
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  readAt   DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+model Report {
+  id             String       @id @default(cuid())
+  reporterUserId String
+  subjectUserId  String?
+
+  category    String
+  description String        @db.Text
+  status      ReportStatus @default(OPEN)
+  resolvedNote String?     @db.Text
+
+  reporter User @relation("ReportsFiled", fields: [reporterUserId], references: [id], onDelete: Cascade)
+  subject  User? @relation("ReportsAgainst", fields: [subjectUserId], references: [id], onDelete: SetNull)
+
+  createdAt  DateTime @default(now())
+  resolvedAt DateTime?
+
+  @@index([status])
+}
+
+model VipSubscription {
+  id           String    @id @default(cuid())
+  profileId    String
+  planName     String
+  validFrom    DateTime  @default(now())
+  validUntil   DateTime
+  active       Boolean   @default(true)
+  externalRef  String?
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([validUntil])
+}
+
+model RefreshToken {
+  id         String   @id @default(cuid())
+  userId     String
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+  rotatedFromId String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  tokenHash String   @unique
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  tokenHash String   @unique
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+}
