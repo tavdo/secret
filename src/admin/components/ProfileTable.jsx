@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Crown,
   EyeOff,
   Globe2,
   PencilLine,
@@ -72,11 +71,6 @@ export const ProfileTable = memo(function ProfileTable({
               </td>
               <td className="p-4 hidden lg:table-cell">
                 <div className="flex flex-wrap gap-1.5">
-                  {p.vip && (
-                    <span className="inline-flex rounded-md border border-amber-400/35 bg-amber-500/10 px-1.5 py-0.5 text-amber-100">
-                      <Crown className="h-3.5 w-3.5" />
-                    </span>
-                  )}
                   {p.available ? (
                     <span title="Online" className="text-emerald-300">
                       <Wifi className="h-4 w-4" />
