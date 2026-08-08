@@ -1,11 +1,9 @@
 import type { Role } from "@prisma/client";
 
-declare global {
-  namespace Express {
-    interface Request {
-      auth?: { userId: string; role: Role };
-      requestId?: string;
-    }
+declare module "express-serve-static-core" {
+  interface Request {
+    auth?: { userId: string; role: Role };
+    requestId?: string;
   }
 }
 

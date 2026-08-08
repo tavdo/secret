@@ -1,3 +1,4 @@
+import "./types/express-augment.js";
 import express from "express";
 import { applySecurityMiddleware } from "./middleware/security.js";
 import { requestId } from "./middleware/requestId.js";

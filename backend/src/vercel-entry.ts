@@ -1,4 +1,4 @@
-/// <reference path="./types/express/index.d.ts" />
+import "./types/express-augment.js";
 import { createApp } from "./app.js";
 
 /** Express app export for Vercel Services (no listen). */
