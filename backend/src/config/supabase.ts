@@ -29,7 +29,9 @@ export function getSupabaseAnon() {
 /**
  * Verify a Bearer token on an Express request via Supabase JWKS.
  */
-export async function verifySupabaseRequest(req: Request) {
+export async function verifySupabaseRequest(
+  req: Request
+): Promise<{ data: unknown; error: unknown }> {
   const headers = new Headers();
   for (const [key, value] of Object.entries(req.headers)) {
     if (typeof value === "string") headers.set(key, value);
@@ -39,5 +41,8 @@ export async function verifySupabaseRequest(req: Request) {
     method: req.method,
     headers,
   });
-  return verifyAuth(request, { auth: "user" });
+  return verifyAuth(request, { auth: "user" }) as Promise<{
+    data: unknown;
+    error: unknown;
+  }>;
 }
