@@ -38,8 +38,12 @@ export function clearAdminSession() {
   localStorage.removeItem(META_KEY);
 }
 
+const API_BASE =
+  import.meta.env.VITE_API_BASE ??
+  (import.meta.env.PROD ? '/api/v1' : '/v1');
+
 export const adminApi = axios.create({
-  baseURL: import.meta.env.VITE_ADMIN_API_URL ?? '/v1/admin',
+  baseURL: import.meta.env.VITE_ADMIN_API_URL ?? `${API_BASE}/admin`,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -48,7 +52,7 @@ export const adminApi = axios.create({
 });
 
 export const authApi = axios.create({
-  baseURL: import.meta.env.VITE_AUTH_API_URL ?? '/v1/auth',
+  baseURL: import.meta.env.VITE_AUTH_API_URL ?? `${API_BASE}/auth`,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',

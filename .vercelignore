@@ -1,6 +1,7 @@
-backend
 node_modules
 .git
-*.md
 .cursor
 agent-transcripts
+backend/node_modules
+backend/dist
+*.md

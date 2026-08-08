@@ -19,8 +19,13 @@ export function createApp(): express.Application {
   app.get("/healthz", (_req, res) => {
     res.json({ ok: true });
   });
+  // Vercel Services mount the API under /api/*
+  app.get("/api/healthz", (_req, res) => {
+    res.json({ ok: true });
+  });
 
   app.use("/v1", v1Routes);
+  app.use("/api/v1", v1Routes);
 
   app.use(notFound);
   app.use(errorHandler);
