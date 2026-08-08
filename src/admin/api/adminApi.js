@@ -38,9 +38,8 @@ export function clearAdminSession() {
   localStorage.removeItem(META_KEY);
 }
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE ??
-  (import.meta.env.PROD ? '/api/v1' : '/v1');
+// Always hit the Vercel / local `/api` rewrite (never bare `/v1` — SPA catches that).
+const API_BASE = import.meta.env.VITE_API_BASE || '/api/v1';
 
 export const adminApi = axios.create({
   baseURL: import.meta.env.VITE_ADMIN_API_URL ?? `${API_BASE}/admin`,

@@ -14,7 +14,8 @@ const Explore = () => {
   const filteredProfiles = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return profiles.filter((profile) => {
-      const hay = `${profile.name} ${profile.location} ${profile.tags.join(' ')} ${profile.servicesText}`.toLowerCase();
+      const tags = Array.isArray(profile.tags) ? profile.tags.join(' ') : '';
+      const hay = `${profile.name} ${profile.location} ${tags} ${profile.servicesText || ''}`.toLowerCase();
       const matchesSearch = !q || hay.includes(q);
       const matchesCategory =
         activeCategory === 'ყველა' ||

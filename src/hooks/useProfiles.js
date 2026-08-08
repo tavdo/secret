@@ -17,35 +17,32 @@ export function useProfiles(options = {}) {
 
   useEffect(() => {
     let cancelled = false;
+    /* eslint-disable react-hooks/set-state-in-effect -- fetch lifecycle */
+    setLoading(true);
+    setError('');
+    /* eslint-enable react-hooks/set-state-in-effect */
 
-    const timer = setTimeout(() => {
-      if (cancelled) return;
-      setLoading(true);
-      setError('');
-
-      fetchProfiles({ city, sort, take, vip, featured })
-        .then((data) => {
-          if (cancelled) return;
-          const items = Array.isArray(data?.items) ? data.items.map(mapProfile) : [];
-          setProfiles(items.filter(Boolean));
-        })
-        .catch((err) => {
-          if (cancelled) return;
-          setError(
-            err?.response?.data?.error ||
-              err?.message ||
-              'პროფილების ჩატვირთვა ვერ მოხერხდა'
-          );
-          setProfiles([]);
-        })
-        .finally(() => {
-          if (!cancelled) setLoading(false);
-        });
-    }, 0);
+    fetchProfiles({ city, sort, take, vip, featured })
+      .then((data) => {
+        if (cancelled) return;
+        const items = Array.isArray(data?.items) ? data.items.map(mapProfile) : [];
+        setProfiles(items.filter(Boolean));
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(
+          err?.response?.data?.error ||
+            err?.message ||
+            'პროფილების ჩატვირთვა ვერ მოხერხდა'
+        );
+        setProfiles([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
     return () => {
       cancelled = true;
-      clearTimeout(timer);
     };
   }, [city, sort, take, vip, featured]);
 

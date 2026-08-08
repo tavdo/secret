@@ -31,9 +31,9 @@ export function mapProfile(raw) {
   if (!raw) return null;
 
   const galleryFromPublic = Array.isArray(raw.galleryItems)
-    ? raw.galleryItems.map((g) => g?.url).filter(Boolean)
+    ? raw.galleryItems.map((g) => (typeof g === 'string' ? g : g?.url)).filter(Boolean)
     : [];
-  const galleryUrls = raw.galleryUrls || galleryFromPublic;
+  const galleryUrls = Array.isArray(raw.galleryUrls) ? raw.galleryUrls.filter(Boolean) : galleryFromPublic;
   const images = [raw.avatarUrl, ...galleryUrls].filter(Boolean);
   const uniqueImages = [...new Set(images)];
   if (!uniqueImages.length) uniqueImages.push(PLACEHOLDER);

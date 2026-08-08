@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { getStoredUserSession } from './publicAuth';
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE ??
-  (import.meta.env.PROD ? '/api/v1' : '/v1');
+// Always hit the Vercel / local `/api` rewrite (never bare `/v1` — SPA catches that).
+const API_BASE = import.meta.env.VITE_API_BASE || '/api/v1';
 
 export const publicApi = axios.create({
   baseURL: API_BASE,
