@@ -2,9 +2,10 @@
 import { motion } from "framer-motion";
 import { BadgeCheck, EyeOff } from "lucide-react";
 import { GlassPanel } from "../components/GlassPanel.jsx";
-import { moderationQueue } from "../data/mockAdminData.js";
 import { useAdminToast } from "../context/ToastContext.jsx";
 import { Modal } from "../components/Modal.jsx";
+
+const moderationQueue = [];
 
 export function AdminModeration() {
   const [blurSens, setBlurSens] = useState(true);
@@ -28,6 +29,10 @@ export function AdminModeration() {
           <EyeOff className="inline h-4 w-4 mr-2" aria-hidden /> {blurSens ? "Sensory blur ON" : "RAW preview"}
         </button>
       </div>
+
+      {moderationQueue.length === 0 ? (
+        <GlassPanel className="p-10 text-center text-sm text-zinc-500">No profiles awaiting moderation.</GlassPanel>
+      ) : null}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {moderationQueue.map((m, idx) => (

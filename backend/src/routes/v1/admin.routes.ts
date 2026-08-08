@@ -33,6 +33,87 @@ adminRouter.patch(
   })
 );
 
+adminRouter.get(
+  "/profiles",
+  query("take").optional(),
+  query("cursor").optional(),
+  query("q").optional().isString(),
+  validateReq,
+  asyncHandler(async (req, res) => {
+    const takeRaw = clampTake(req.query.take, 200);
+    const cursor = typeof req.query.cursor === "string" ? req.query.cursor : undefined;
+    const q = typeof req.query.q === "string" ? req.query.q : undefined;
+    res.json(await adminSvc.listProfiles(takeRaw, cursor, q));
+  })
+);
+
+adminRouter.get(
+  "/profiles/:profileId",
+  [param("profileId").isString(), validateReq],
+  asyncHandler(async (req, res) => {
+    res.json(await adminSvc.getProfile(req.params.profileId));
+  })
+);
+
+adminRouter.post(
+  "/profiles",
+  [
+    body("displayName").trim().isLength({ min: 2, max: 120 }),
+    body("handle").optional().isString(),
+    body("email").optional().trim().isEmail(),
+    body("password").optional().isString().isLength({ min: 10, max: 128 }),
+    body("age").optional().isInt({ min: 18, max: 120 }),
+    body("city").trim().isLength({ min: 1, max: 120 }),
+    body("bio").optional().isString(),
+    body("hourlyRate").optional().isInt({ min: 0, max: 1_000_000 }),
+    body("vip").optional().isBoolean(),
+    body("available").optional().isBoolean(),
+    body("hidden").optional().isBoolean(),
+    body("featured").optional().isBoolean(),
+    body("avatar").optional().isString(),
+    body("gallery").optional().isArray({ max: 40 }),
+    body("gallery.*").optional().isString(),
+    validateReq,
+  ],
+  asyncHandler(async (req, res) => {
+    const created = await adminSvc.createProfile(req.body as never);
+    res.status(201).json(created);
+  })
+);
+
+adminRouter.patch(
+  "/profiles/:profileId",
+  [
+    param("profileId").isString(),
+    body("displayName").optional().trim().isLength({ min: 2, max: 120 }),
+    body("handle").optional().isString(),
+    body("age").optional({ nullable: true }).isInt({ min: 18, max: 120 }),
+    body("city").optional().trim().isLength({ min: 1, max: 120 }),
+    body("bio").optional().isString(),
+    body("hourlyRate").optional().isInt({ min: 0, max: 1_000_000 }),
+    body("vip").optional().isBoolean(),
+    body("available").optional().isBoolean(),
+    body("hidden").optional().isBoolean(),
+    body("featured").optional().isBoolean(),
+    body("avatar").optional().isString(),
+    body("gallery").optional().isArray({ max: 40 }),
+    body("gallery.*").optional().isString(),
+    validateReq,
+  ],
+  asyncHandler(async (req, res) => {
+    const updated = await adminSvc.updateProfile(req.params.profileId, req.body as never);
+    res.json(updated);
+  })
+);
+
+adminRouter.delete(
+  "/profiles/:profileId",
+  [param("profileId").isString(), validateReq],
+  asyncHandler(async (req, res) => {
+    res.json(await adminSvc.deleteProfile(req.params.profileId));
+  })
+);
+
 adminRouter.patch(
   "/profiles/:profileId/moderate",
   [

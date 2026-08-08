@@ -10,9 +10,8 @@ import { useAdminData } from '../context/AdminDataContext.jsx';
 import { useAdminToast } from '../context/ToastContext.jsx';
 
 export function AdminProfiles() {
-  const { profiles, deleteProfile } = useAdminData();
+  const { profiles, profilesLoading, profilesError, refreshProfiles, deleteProfile } = useAdminData();
   const { toast } = useAdminToast();
-  const [loading] = useState(false);
   const [q, setQ] = useState('');
   const [city, setCity] = useState('ALL');
   const [vipOnly, setVipOnly] = useState(false);
@@ -21,6 +20,7 @@ export function AdminProfiles() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [purge, setPurge] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const cities = useMemo(() => {
     const s = new Set(profiles.map((p) => p.city).filter(Boolean));
@@ -51,9 +51,9 @@ export function AdminProfiles() {
           <p className="text-[11px] uppercase tracking-[0.36em] text-amber-500/80 font-semibold">
             Control nucleus
           </p>
-          <h1 className="mt-1 text-4xl font-semibold tracking-tight text-white">Profile matrix</h1>
+          <h1 className="mt-1 text-4xl font-semibold tracking-tight text-white">Profiles</h1>
           <p className="text-sm text-zinc-500 mt-2 max-w-2xl leading-relaxed">
-            CRUD‑ready storefront talent — sovereign editing, luminous flags, carousel choreography.
+            Add, edit, or remove marketplace profiles. Changes save to the live database.
           </p>
         </div>
         <motion.button
@@ -66,9 +66,24 @@ export function AdminProfiles() {
           }}
           className="inline-flex items-center gap-2 rounded-2xl border border-amber-400/35 bg-gradient-to-r from-amber-500/30 to-transparent px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.22em]"
         >
-          <Plus className="h-4 w-4" /> Mint profile
+          <Plus className="h-4 w-4" /> Add profile
         </motion.button>
       </div>
+
+      {profilesError ? (
+        <GlassPanel className="p-4 border border-rose-500/25">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-rose-200">{profilesError}</p>
+            <button
+              type="button"
+              onClick={() => refreshProfiles()}
+              className="rounded-xl border border-white/15 px-3 py-1.5 text-[11px] uppercase tracking-[0.18em] text-zinc-300"
+            >
+              Retry
+            </button>
+          </div>
+        </GlassPanel>
+      ) : null}
 
       <GlassPanel hoverGlow className="p-4 md:p-6">
         <div className="flex flex-wrap gap-3 items-center">
@@ -117,12 +132,16 @@ export function AdminProfiles() {
         </div>
 
         <div className="mt-8">
-          {loading ? (
+          {profilesLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
                 <SkeletonPulse key={i} className="h-14 rounded-xl w-full" />
               ))}
             </div>
+          ) : filtered.length === 0 ? (
+            <p className="py-12 text-center text-sm text-zinc-500">
+              No profiles yet. Click <span className="text-amber-200">Add profile</span> to create one.
+            </p>
           ) : (
             <ProfileTable
               profiles={filtered}
@@ -147,17 +166,27 @@ export function AdminProfiles() {
 
       <DeleteConfirmModal
         open={Boolean(purge)}
-        onClose={() => setPurge(null)}
-        title="Revoke showcase"
+        onClose={() => (!deleting ? setPurge(null) : null)}
+        title="Delete profile"
         message={
           purge
-            ? `Permanently delist ${purge.displayName}? Media ties release from admin graph (demo persistence).`
+            ? `Permanently delete ${purge.displayName}? This removes the provider account and listing.`
             : ''
         }
-        onConfirm={() => {
-          if (purge) {
-            deleteProfile(purge.id);
-            toast({ title: 'Listing purged', variant: 'danger' });
+        onConfirm={async () => {
+          if (!purge) return;
+          setDeleting(true);
+          try {
+            await deleteProfile(purge.id);
+            toast({ title: 'Profile deleted', variant: 'danger' });
+            setPurge(null);
+          } catch (err) {
+            toast({
+              title: err?.response?.data?.error || err?.message || 'Delete failed',
+              variant: 'danger',
+            });
+          } finally {
+            setDeleting(false);
           }
         }}
       />

@@ -98,11 +98,13 @@ model Profile {
   slug                String               @unique
   bio                 String               @db.Text
   city                String
+  age                 Int?
   avatarUrl           String?
   avatarPublicId      String?
 
   verificationStatus  VerificationStatus   @default(UNVERIFIED)
   vipBadge            Boolean              @default(false)
+  featured            Boolean              @default(false)
   avgRating           Decimal              @default(0) @db.Decimal(3, 2)
   reviewCount         Int                  @default(0)
 

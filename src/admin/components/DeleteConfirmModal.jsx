@@ -26,9 +26,8 @@ export function DeleteConfirmModal({
               ? 'bg-gradient-to-br from-rose-600 to-rose-800 text-white border border-rose-400/40'
               : 'bg-amber-500/90 text-black border border-amber-300'
           }`}
-          onClick={() => {
-            onConfirm?.();
-            onClose?.();
+          onClick={async () => {
+            await onConfirm?.();
           }}
         >
           {confirmLabel}

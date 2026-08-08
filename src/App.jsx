@@ -8,7 +8,9 @@ import Auth from './pages/Auth';
 import Favorites from './pages/Favorites';
 import VIPOnly from './pages/VIPOnly';
 import Pricing from './pages/Pricing';
+import { AdminAuthLayout } from './admin/layouts/AdminAuthLayout.jsx';
 import { AdminShell } from './admin/layouts/AdminShell';
+import { AdminLogin } from './admin/pages/AdminLogin.jsx';
 import { AdminOverview } from './admin/pages/AdminOverview';
 import { AdminProfiles } from './admin/pages/AdminProfiles';
 import { AdminPricing } from './admin/pages/AdminPricing';
@@ -37,19 +39,22 @@ function App() {
           <Route path="pricing" element={<Pricing />} />
         </Route>
 
-        <Route path="/admin/*" element={<AdminShell />}>
-          <Route index element={<AdminOverview />} />
-          <Route path="profiles" element={<AdminProfiles />} />
-          <Route path="pricing" element={<AdminPricing />} />
-          <Route path="content" element={<AdminContent />} />
-          <Route path="media" element={<AdminMedia />} />
-          <Route path="users" element={<AdminUsers />} />
-          <Route path="moderation" element={<AdminModeration />} />
-          <Route path="bookings" element={<AdminBookings />} />
-          <Route path="messaging" element={<AdminMessaging />} />
-          <Route path="vip" element={<AdminVIP />} />
-          <Route path="reports" element={<AdminReports />} />
-          <Route path="analytics" element={<AdminAnalytics />} />
+        <Route path="/admin" element={<AdminAuthLayout />}>
+          <Route path="login" element={<AdminLogin />} />
+          <Route element={<AdminShell />}>
+            <Route index element={<AdminOverview />} />
+            <Route path="profiles" element={<AdminProfiles />} />
+            <Route path="pricing" element={<AdminPricing />} />
+            <Route path="content" element={<AdminContent />} />
+            <Route path="media" element={<AdminMedia />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="moderation" element={<AdminModeration />} />
+            <Route path="bookings" element={<AdminBookings />} />
+            <Route path="messaging" element={<AdminMessaging />} />
+            <Route path="vip" element={<AdminVIP />} />
+            <Route path="reports" element={<AdminReports />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

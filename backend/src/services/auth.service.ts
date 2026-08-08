@@ -297,6 +297,80 @@ export class AuthService {
     return { ok: true as const };
   }
 
+  /**
+   * One-time bootstrap: create the first ADMIN when none exist.
+   * Disabled automatically after the first admin is created.
+   */
+  async bootstrapAdmin(input: {
+    email: string;
+    password: string;
+    displayName?: string;
+  }) {
+    const adminCount = await this.db.user.count({ where: { role: "ADMIN" } });
+    if (adminCount > 0) {
+      throw new AppError("Admin already bootstrapped", 403);
+    }
+
+    const email = input.email.trim().toLowerCase();
+    const existing = await this.db.user.findUnique({ where: { email } });
+    if (existing) throw new AppError("Email already in use");
+
+    const passwordHash = await bcrypt.hash(input.password, bcryptRounds);
+    const displayName = (input.displayName?.trim() || "Admin").slice(0, 120);
+    const slug = slugify(displayName, randomBytes(3).toString("hex"));
+
+    const user = await this.db.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: {
+          email,
+          passwordHash,
+          role: "ADMIN",
+          emailVerified: true,
+          accountStatus: "ACTIVE",
+        },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          emailVerified: true,
+        },
+      });
+
+      await tx.profile.create({
+        data: {
+          userId: created.id,
+          displayName,
+          slug,
+          bio: "Platform administrator",
+          city: "HQ",
+          active: false,
+          availability: "OFFLINE",
+        },
+      });
+
+      return created;
+    });
+
+    const access = signAccessToken(user.id, "ADMIN");
+    const refreshJwt = signRefreshToken(user.id);
+    const rtHash = hashToken(refreshJwt);
+    await this.db.refreshToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: rtHash,
+        expiresAt: new Date(Date.now() + env.JWT_REFRESH_TTL_SECONDS * 1000),
+      },
+    });
+
+    return {
+      accessToken: access,
+      refreshToken: refreshJwt,
+      userId: user.id,
+      role: user.role as Role,
+      emailVerified: true,
+    };
+  }
+
   private async touchProfileActivity(userId: string) {
     await this.db.profile.updateMany({
       where: { userId },

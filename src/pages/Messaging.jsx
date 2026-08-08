@@ -8,7 +8,7 @@ import { MOCK_CHATS } from '../data/mockData';
 import Button from '../components/common/Button';
 
 const Messaging = () => {
-  const [selectedChat, setSelectedChat] = useState(MOCK_CHATS[0]);
+  const [selectedChat, setSelectedChat] = useState(null);
   const [message, setMessage] = useState('');
   const [showMobileList, setShowMobileList] = useState(true);
 
@@ -35,6 +35,9 @@ const Messaging = () => {
           </div>
           
           <div className="flex-grow overflow-y-auto px-2 no-scrollbar">
+            {MOCK_CHATS.length === 0 ? (
+              <p className="px-4 py-8 text-sm text-white/40 text-center">No conversations yet.</p>
+            ) : null}
             {MOCK_CHATS.map((chat) => (
               <button
                 key={chat.id}

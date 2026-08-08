@@ -7,33 +7,16 @@ import {
   useState,
 } from 'react';
 import {
-  bookingsAdmin,
-  vipSubscriptions as vipSubsSeed,
-  activityFeed as activitySeed,
-  statsOverview as statsSeed,
-  users as usersSeed,
-} from '../data/mockAdminData.js';
-import {
-  seedMediaAssets,
-  seedPricingPackages,
-  seedProfiles,
-  seedVipTiers,
-} from '../data/controlPlaneSeed.js';
+  createProfileRemote,
+  deleteProfileRemote,
+  fetchProfilesRemote,
+  persistProfileRemote,
+} from '../api/adminApi.js';
 
-const STORAGE_KEY = 'secret-admin-plane-v1';
+const STORAGE_KEY = 'secret-admin-plane-v2';
 
 const genId = (prefix) =>
   `${prefix}-${Date.now().toString(36)}-${Math.floor(Math.random() * 9999)}`;
-
-/** @typedef {ReturnType<typeof seedProfiles>[number]} MarketplaceProfile */
-
-const initialActivity = activitySeed.map((a) => ({
-  id: a.id,
-  type: a.type,
-  actor: a.actor,
-  summary: a.summary,
-  ts: a.ts,
-}));
 
 function safeParse(raw) {
   try {
@@ -49,29 +32,16 @@ const AdminDataContext = createContext(null);
 export function AdminDataProvider({ children }) {
   const stored = typeof sessionStorage !== 'undefined' ? safeParse(sessionStorage.getItem(STORAGE_KEY)) : null;
 
-  const [profiles, setProfiles] = useState(
-    () => stored?.profiles ?? seedProfiles().map((p) => structuredClone(p))
-  );
-  const [bookings, setBookings] = useState(
-    () =>
-      stored?.bookings ??
-      bookingsAdmin.map((b) => ({ ...b }))
-  );
-  const [usersList, setUsersList] = useState(
-    () => stored?.usersList ?? usersSeed.map((u) => ({ ...u }))
-  );
-  const [pricingPackages, setPricingPackages] = useState(
-    () => stored?.pricingPackages ?? seedPricingPackages()
-  );
-  const [vipTiers, setVipTiers] = useState(() => stored?.vipTiers ?? seedVipTiers());
-  const [vipSubscriptions, setVipSubscriptions] = useState(
-    () => stored?.vipSubscriptions ?? vipSubsSeed.map((v) => ({ ...v }))
-  );
-  const [mediaLibrary, setMediaLibrary] = useState(() => {
-    if (stored?.mediaLibrary?.length) return stored.mediaLibrary;
-    return seedMediaAssets();
-  });
-  const [activityLog, setActivityLog] = useState(() => stored?.activityLog ?? initialActivity);
+  const [profiles, setProfiles] = useState([]);
+  const [profilesLoading, setProfilesLoading] = useState(true);
+  const [profilesError, setProfilesError] = useState('');
+  const [bookings, setBookings] = useState(() => stored?.bookings ?? []);
+  const [usersList, setUsersList] = useState(() => stored?.usersList ?? []);
+  const [pricingPackages, setPricingPackages] = useState(() => stored?.pricingPackages ?? []);
+  const [vipTiers, setVipTiers] = useState(() => stored?.vipTiers ?? []);
+  const [vipSubscriptions, setVipSubscriptions] = useState(() => stored?.vipSubscriptions ?? []);
+  const [mediaLibrary, setMediaLibrary] = useState(() => stored?.mediaLibrary ?? []);
+  const [activityLog, setActivityLog] = useState(() => stored?.activityLog ?? []);
 
   const persist = useCallback(
     (snap) => {
@@ -86,7 +56,6 @@ export function AdminDataProvider({ children }) {
 
   useEffect(() => {
     persist({
-      profiles,
       bookings,
       usersList,
       pricingPackages,
@@ -97,7 +66,6 @@ export function AdminDataProvider({ children }) {
     });
   }, [
     persist,
-    profiles,
     bookings,
     usersList,
     pricingPackages,
@@ -113,43 +81,55 @@ export function AdminDataProvider({ children }) {
     );
   }, []);
 
-  const addProfile = useCallback((payload) => {
-    const id = genId('prof');
-    const row = {
-      id,
+  const refreshProfiles = useCallback(async () => {
+    setProfilesLoading(true);
+    setProfilesError('');
+    try {
+      const data = await fetchProfilesRemote();
+      setProfiles(Array.isArray(data?.items) ? data.items : []);
+    } catch (err) {
+      setProfilesError(err?.response?.data?.error || err?.message || 'Failed to load profiles');
+      setProfiles([]);
+    } finally {
+      setProfilesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshProfiles();
+  }, [refreshProfiles]);
+
+  const addProfile = useCallback(async (payload) => {
+    const row = await createProfileRemote({
       displayName: payload.displayName,
-      handle:
-        payload.handle?.trim() ||
-        `@${payload.displayName.toLowerCase().replace(/\s+/g, '_')}`,
-      age: payload.age ?? 25,
-      city: payload.city ?? 'TBD',
-      bio: payload.bio ?? '<p>New profile biography.</p>',
-      hourlyRate: payload.hourlyRate ?? 650,
+      handle: payload.handle,
+      email: payload.email,
+      password: payload.password,
+      age: payload.age,
+      city: payload.city || 'Batumi',
+      bio: payload.bio,
+      hourlyRate: payload.hourlyRate,
       vip: Boolean(payload.vip),
       available: payload.available !== false,
       hidden: Boolean(payload.hidden),
       featured: Boolean(payload.featured),
-      avatar: payload.avatar ?? '',
+      avatar: payload.avatar || '',
       gallery: Array.isArray(payload.gallery) ? payload.gallery : [],
-      createdAt: new Date().toISOString().slice(0, 10),
-      updatedAt: new Date().toISOString().slice(0, 10),
-      sortOrder: profiles.length,
-    };
-    setProfiles((p) => [...p, row]);
-    pushActivity('profiles', payload.displayName, 'New showcase published via control tower');
-    return id;
-  }, [profiles.length, pushActivity]);
-
-  const updateProfile = useCallback((id, patch) => {
-    setProfiles((prev) =>
-      prev.map((p) =>
-        p.id === id ? { ...p, ...patch, updatedAt: new Date().toISOString().slice(0, 10) } : p
-      )
-    );
-    pushActivity('profiles', `@${patch.displayName ?? id}`, 'Profile matrix updated');
+    });
+    setProfiles((prev) => [row, ...prev]);
+    pushActivity('profiles', row.displayName, 'New showcase published via control tower');
+    return row.id;
   }, [pushActivity]);
 
-  const deleteProfile = useCallback((id) => {
+  const updateProfile = useCallback(async (id, patch) => {
+    const row = await persistProfileRemote(id, patch);
+    setProfiles((prev) => prev.map((p) => (p.id === id ? row : p)));
+    pushActivity('profiles', row.handle || id, 'Profile matrix updated');
+    return row;
+  }, [pushActivity]);
+
+  const deleteProfile = useCallback(async (id) => {
+    await deleteProfileRemote(id);
     setProfiles((prev) => prev.filter((p) => p.id !== id));
     setMediaLibrary((prev) => prev.filter((m) => m.profileId !== id));
     pushActivity('profiles', id, 'Profile revoked from storefront');
@@ -255,8 +235,9 @@ export function AdminDataProvider({ children }) {
     pushActivity('vip', id, `Plan rewired → ${plan}`);
   }, [pushActivity]);
 
-  const toggleProfileVip = useCallback((id, vipFlag) => {
-    setProfiles((prev) => prev.map((p) => (p.id === id ? { ...p, vip: vipFlag } : p)));
+  const toggleProfileVip = useCallback(async (id, vipFlag) => {
+    const row = await persistProfileRemote(id, { vip: vipFlag });
+    setProfiles((prev) => prev.map((p) => (p.id === id ? row : p)));
   }, []);
 
   const addMedia = useCallback(({ url, profileId, label }) => {
@@ -310,16 +291,13 @@ export function AdminDataProvider({ children }) {
     const confirmedValue = bookings
       .filter((b) => b.status === 'COMPLETED' || b.status === 'ACCEPTED')
       .reduce((s, b) => s + b.value, 0);
-    const monthlyRevenue = Math.round(
-      statsSeed.monthlyRevenue * 0.55 + confirmedValue * 12
-    );
     return {
       totalUsers: usersList.length,
       totalProfiles,
       activeProfiles: activePublic,
       onlineNow: onlineShowcases,
-      monthlyRevenue,
-      revenueChangePct: statsSeed.revenueChangePct,
+      monthlyRevenue: confirmedValue,
+      revenueChangePct: 0,
       pendingBookings,
     };
   }, [profiles, bookings, usersList.length]);
@@ -327,6 +305,9 @@ export function AdminDataProvider({ children }) {
   const value = useMemo(
     () => ({
       profiles,
+      profilesLoading,
+      profilesError,
+      refreshProfiles,
       bookings,
       users: usersList,
       pricingPackages,
@@ -358,6 +339,9 @@ export function AdminDataProvider({ children }) {
     }),
     [
       profiles,
+      profilesLoading,
+      profilesError,
+      refreshProfiles,
       bookings,
       usersList,
       pricingPackages,

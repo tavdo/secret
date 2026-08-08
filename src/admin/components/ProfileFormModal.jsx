@@ -10,9 +10,11 @@ import { useAdminToast } from '../context/ToastContext.jsx';
 const defaults = () => ({
   displayName: '',
   handle: '',
+  email: '',
+  password: '',
   age: 26,
-  city: '',
-  bio: '<p>Edit this biography.</p>',
+  city: 'Batumi',
+  bio: '',
   hourlyRate: 750,
   vip: false,
   available: true,
@@ -27,8 +29,10 @@ function sliceFromEditing(editing) {
   return {
     displayName: editing.displayName,
     handle: editing.handle,
+    email: editing.email || '',
+    password: '',
     age: editing.age,
-    city: editing.city,
+    city: editing.city || 'Batumi',
     bio: editing.bio,
     hourlyRate: editing.hourlyRate,
     vip: editing.vip,
@@ -48,8 +52,8 @@ export function ProfileFormModal({ open, onClose, editing }) {
       open={open}
       onClose={onClose}
       size="xl"
-      title={isEdit ? 'Architect showcase' : 'Mint showcase'}
-      subtitle="Premium marketplace fields — hydrate via adminApi later."
+      title={isEdit ? 'Edit profile' : 'Add profile'}
+      subtitle="Creates or updates a live provider listing in the database."
     >
       {open ? (
         <ProfileFormBody key={editing?.id ?? 'create'} editing={editing} onClose={onClose} />
@@ -61,32 +65,60 @@ export function ProfileFormModal({ open, onClose, editing }) {
 function ProfileFormBody({ editing, onClose }) {
   const isEdit = Boolean(editing);
   const [form, setForm] = useState(() => sliceFromEditing(editing));
+  const [busy, setBusy] = useState(false);
   const { addProfile, updateProfile, addMedia } = useAdminData();
   const { toast } = useAdminToast();
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
 
-  const save = () => {
+  const save = async () => {
     if (!form.displayName.trim()) {
       toast({ title: 'Name required', variant: 'danger' });
       return;
     }
-    if (isEdit) {
-      const before = new Set(editing.gallery || []);
-      updateProfile(editing.id, form);
-      (form.gallery || []).forEach((u) => {
-        if (!before.has(u))
-          addMedia({ url: u, profileId: editing.id, label: `${form.displayName} carousel` });
-      });
-      toast({ title: 'Showcase rewired', variant: 'success' });
-    } else {
-      const nid = addProfile(form);
-      (form.gallery || []).forEach((u) =>
-        addMedia({ url: u, profileId: nid, label: `${form.displayName} carousel` })
-      );
-      toast({ title: 'Minted listing', variant: 'success' });
+    if (!form.city.trim()) {
+      toast({ title: 'City required', variant: 'danger' });
+      return;
     }
-    onClose?.();
+    setBusy(true);
+    try {
+      if (isEdit) {
+        const before = new Set(editing.gallery || []);
+        await updateProfile(editing.id, {
+          displayName: form.displayName,
+          handle: form.handle,
+          age: form.age,
+          city: form.city,
+          bio: form.bio,
+          hourlyRate: form.hourlyRate,
+          vip: form.vip,
+          available: form.available,
+          hidden: form.hidden,
+          featured: form.featured,
+          avatar: form.avatar,
+          gallery: form.gallery,
+        });
+        (form.gallery || []).forEach((u) => {
+          if (!before.has(u))
+            addMedia({ url: u, profileId: editing.id, label: `${form.displayName} carousel` });
+        });
+        toast({ title: 'Profile updated', variant: 'success' });
+      } else {
+        const nid = await addProfile(form);
+        (form.gallery || []).forEach((u) =>
+          addMedia({ url: u, profileId: nid, label: `${form.displayName} carousel` })
+        );
+        toast({ title: 'Profile created', variant: 'success' });
+      }
+      onClose?.();
+    } catch (err) {
+      toast({
+        title: err?.response?.data?.error || err?.message || 'Save failed',
+        variant: 'danger',
+      });
+    } finally {
+      setBusy(false);
+    }
   };
 
   const attachImage = (url) => {
@@ -110,7 +142,7 @@ function ProfileFormBody({ editing, onClose }) {
                 onChange={(e) => set({ displayName: e.target.value })}
               />
             </Field>
-            <Field label="Handle">
+            <Field label="Handle / slug">
               <input
                 className={inputCls}
                 placeholder="@handle"
@@ -118,6 +150,32 @@ function ProfileFormBody({ editing, onClose }) {
                 onChange={(e) => set({ handle: e.target.value })}
               />
             </Field>
+            {!isEdit ? (
+              <>
+                <Field label="Provider email (optional)">
+                  <input
+                    type="email"
+                    className={inputCls}
+                    placeholder="auto-generated if empty"
+                    value={form.email}
+                    onChange={(e) => set({ email: e.target.value })}
+                  />
+                </Field>
+                <Field label="Temp password (optional)">
+                  <input
+                    type="text"
+                    className={inputCls}
+                    placeholder="auto-generated if empty"
+                    value={form.password}
+                    onChange={(e) => set({ password: e.target.value })}
+                  />
+                </Field>
+              </>
+            ) : (
+              <Field label="Linked email">
+                <input className={inputCls} value={form.email} disabled />
+              </Field>
+            )}
             <Field label="Age">
               <input
                 type="number"
@@ -127,12 +185,14 @@ function ProfileFormBody({ editing, onClose }) {
                 onChange={(e) => set({ age: Number(e.target.value) || 18 })}
               />
             </Field>
-            <Field label="Metro">
-              <input
+            <Field label="City">
+              <select
                 className={inputCls}
-                value={form.city}
+                value={form.city || 'Batumi'}
                 onChange={(e) => set({ city: e.target.value })}
-              />
+              >
+                <option value="Batumi">Batumi</option>
+              </select>
             </Field>
           </div>
           <Field label="Hourly rate (USD)">
@@ -191,17 +251,19 @@ function ProfileFormBody({ editing, onClose }) {
           type="button"
           whileTap={{ scale: 0.98 }}
           onClick={onClose}
-          className="rounded-xl border border-white/12 px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-zinc-400 hover:text-white"
+          disabled={busy}
+          className="rounded-xl border border-white/12 px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-zinc-400 hover:text-white disabled:opacity-50"
         >
-          Abort
+          Cancel
         </motion.button>
         <motion.button
           type="button"
           whileTap={{ scale: 0.98 }}
           onClick={save}
-          className="rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/90 to-yellow-700/85 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.22em] text-black"
+          disabled={busy}
+          className="rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/90 to-yellow-700/85 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.22em] text-black disabled:opacity-60"
         >
-          Commit lattice
+          {busy ? 'Saving…' : isEdit ? 'Save changes' : 'Create profile'}
         </motion.button>
       </div>
     </>
@@ -233,4 +295,4 @@ function Toggle({ label, checked, onChange }) {
 }
 
 const inputCls =
-  'w-full rounded-xl border border-white/10 bg-black/45 px-3 py-2 text-sm outline-none focus:border-amber-400/40';
+  'w-full rounded-xl border border-white/10 bg-black/45 px-3 py-2 text-sm outline-none focus:border-amber-400/40 disabled:opacity-60';

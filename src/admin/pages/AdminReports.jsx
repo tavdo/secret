@@ -3,10 +3,11 @@ import { motion } from "framer-motion";
 import { Flame, ShieldBan, Zap } from "lucide-react";
 import { GlassPanel } from "../components/GlassPanel.jsx";
 import { TablePagination } from "../components/TablePagination.jsx";
-import { reportsSafety } from "../data/mockAdminData.js";
 import { useAdminToast } from "../context/ToastContext.jsx";
 import { Modal } from "../components/Modal.jsx";
 import { cn } from "../lib/cn.js";
+
+const reportsSafety = [];
 
 export function AdminReports() {
   const ps = 9;

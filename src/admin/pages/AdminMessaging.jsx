@@ -1,8 +1,9 @@
 ﻿import { motion } from "framer-motion";
 import { GlassPanel } from "../components/GlassPanel.jsx";
-import { chatAlerts as alerts } from "../data/mockAdminData.js";
 import { useAdminToast } from "../context/ToastContext.jsx";
 import { RadioReceiver, Radar } from "lucide-react";
+
+const alerts = [];
 
 export function AdminMessaging() {
   const { toast } = useAdminToast();

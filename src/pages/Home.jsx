@@ -58,9 +58,9 @@ const Home = () => {
           <div className="container mx-auto px-6 flex justify-between items-end">
             <div className="flex gap-12">
               {[
-                { label: 'VIP Models', value: '500+' },
-                { label: 'Cities', value: '45' },
-                { label: 'Private Jets', value: '12' },
+                { label: 'VIP Models', value: String(VIP_PROFILES.length) },
+                { label: 'City', value: 'Batumi' },
+                { label: 'Listings', value: 'Live' },
               ].map((stat, i) => (
                 <motion.div 
                   key={stat.label}
@@ -88,29 +88,33 @@ const Home = () => {
         </div>
 
         <div className="px-6 md:px-0">
-          <Swiper
-            modules={[Autoplay, Pagination, EffectCoverflow]}
-            effect={'coverflow'}
-            grabCursor={true}
-            centeredSlides={true}
-            slidesPerView={'auto'}
-            coverflowEffect={{
-              rotate: 5,
-              stretch: 0,
-              depth: 100,
-              modifier: 2,
-              slideShadows: true,
-            }}
-            autoplay={{ delay: 3000 }}
-            pagination={{ clickable: true }}
-            className="vip-swiper pb-20"
-          >
-            {VIP_PROFILES.map((profile) => (
-              <SwiperSlide key={profile.id} className="max-w-[350px]">
-                <ProfileCard profile={profile} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          {VIP_PROFILES.length === 0 ? (
+            <p className="text-center text-white/40 py-16">No VIP profiles yet. Add listings from the admin panel.</p>
+          ) : (
+            <Swiper
+              modules={[Autoplay, Pagination, EffectCoverflow]}
+              effect={'coverflow'}
+              grabCursor={true}
+              centeredSlides={true}
+              slidesPerView={'auto'}
+              coverflowEffect={{
+                rotate: 5,
+                stretch: 0,
+                depth: 100,
+                modifier: 2,
+                slideShadows: true,
+              }}
+              autoplay={{ delay: 3000 }}
+              pagination={{ clickable: true }}
+              className="vip-swiper pb-20"
+            >
+              {VIP_PROFILES.map((profile) => (
+                <SwiperSlide key={profile.id} className="max-w-[350px]">
+                  <ProfileCard profile={profile} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
         </div>
       </section>
 

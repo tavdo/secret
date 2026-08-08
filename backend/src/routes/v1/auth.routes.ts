@@ -37,6 +37,22 @@ authRouter.post(
   })
 );
 
+/** One-time: create first ADMIN when none exist. */
+authRouter.post(
+  "/bootstrap-admin",
+  authLimiter,
+  [
+    body("email").trim().toLowerCase().isEmail(),
+    body("password").isString().isLength({ min: 8, max: 128 }).withMessage("Password too weak"),
+    body("displayName").optional().trim().isLength({ min: 2, max: 120 }),
+    validateReq,
+  ],
+  asyncHandler(async (req, res) => {
+    const tokens = await authSvc.bootstrapAdmin(req.body as never);
+    res.status(201).json(tokens);
+  })
+);
+
 authRouter.post(
   "/refresh",
   authLimiter,

@@ -1,13 +1,12 @@
 import { motion } from 'framer-motion';
-import { Heart, Search, ArrowRight } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { VIP_PROFILES } from '../data/mockData';
 import ProfileCard from '../components/common/ProfileCard';
 import Button from '../components/common/Button';
 import { Link } from 'react-router-dom';
 
 const Favorites = () => {
-  // Mock favorites - first 2 profiles
-  const favorites = VIP_PROFILES.slice(0, 2);
+  const favorites = VIP_PROFILES;
 
   return (
     <div className="pt-28 pb-12 px-6">
@@ -38,22 +37,6 @@ const Favorites = () => {
               </motion.div>
             ))}
             
-            {/* Add More Placeholder */}
-            <Link to="/explore">
-              <motion.div 
-                whileHover={{ scale: 1.02 }}
-                className="luxury-card h-full flex flex-col items-center justify-center p-12 text-center border-dashed border-white/10 bg-transparent group"
-              >
-                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4 group-hover:bg-luxury-gold/10 transition-colors">
-                  <Search size={32} className="text-white/20 group-hover:text-luxury-gold transition-colors" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">Discover More</h3>
-                <p className="text-white/40 text-sm mb-6">Continue exploring our exclusive collection.</p>
-                <div className="text-luxury-gold flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
-                  Explore <ArrowRight size={16} />
-                </div>
-              </motion.div>
-            </Link>
           </div>
         ) : (
           <div className="py-24 glass-dark rounded-3xl text-center border-white/5">

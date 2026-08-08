@@ -18,16 +18,14 @@
 } from "recharts";
 import { motion } from "framer-motion";
 import { GlassPanel } from "../components/GlassPanel.jsx";
-import {
-  revenueSeries,
-  userGrowth,
-  trafficMix,
-  deviceStats,
-  bookingTrends,
-} from "../data/mockAdminData.js";
 import { useAdminToast } from "../context/ToastContext.jsx";
 
 const GOLD = '#D4AF37';
+const revenueSeries = [];
+const userGrowth = [];
+const trafficMix = [];
+const deviceStats = [];
+const bookingTrends = [];
 
 export function AdminAnalytics() {
   const { toast } = useAdminToast();

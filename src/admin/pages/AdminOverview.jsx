@@ -23,15 +23,13 @@ import {
 } from "lucide-react";
 import { GlassPanel } from "../components/GlassPanel.jsx";
 import { StatCard } from "../components/StatCard.jsx";
-import {
-  bookingTrends,
-  revenueSeries,
-} from "../data/mockAdminData.js";
 import { useLivePulse } from "../hooks/useLivePulse.js";
 import { useAdminData } from "../context/AdminDataContext.jsx";
 
 const gold = "#D4AF37";
 const goldMuted = "#C8A962";
+const revenueSeries = [];
+const bookingTrends = [];
 
 export function AdminOverview() {
   const [range, setRange] = useState("30d");
@@ -89,7 +87,7 @@ export function AdminOverview() {
           </span>
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-zinc-400 leading-relaxed">
-          Premium concierge telemetry with glass panels, luminous analytics, and live moderation pulses — demo data seeded for cinematic UX validation.
+          Live control plane for Batumi showcases — profiles, bookings, and moderation.
         </p>
       </motion.div>
 

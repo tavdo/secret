@@ -14,6 +14,7 @@ import {
   MessageSquareWarning,
   PanelLeftClose,
   PanelLeftOpen,
+  LogOut,
   ShieldAlert,
   Users,
   X,
@@ -74,7 +75,7 @@ function NavRows({ collapsed, onNavigate }) {
   );
 }
 
-export function AdminSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
+export function AdminSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen, onLogout }) {
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -128,12 +129,24 @@ export function AdminSidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpe
           )}
           <NavRows collapsed={collapsed} />
         </nav>
-        <div className="border-t border-white/[0.06] px-4 py-3">
+        <div className="border-t border-white/[0.06] px-3 py-3 space-y-2">
+          {onLogout ? (
+            <button
+              type="button"
+              onClick={onLogout}
+              title="Sign out"
+              className={cn(
+                'flex w-full items-center gap-3 rounded-xl border border-white/10 px-3 py-2.5 text-sm text-zinc-400 transition-colors hover:border-rose-400/30 hover:bg-rose-500/10 hover:text-rose-100',
+                collapsed && 'justify-center px-0'
+              )}
+            >
+              <LogOut className="h-4 w-4 shrink-0" />
+              {!collapsed && <span>Sign out</span>}
+            </button>
+          ) : null}
           {!collapsed ? (
-            <p className="text-[11px] leading-snug text-zinc-600">Premium dark console · demo telemetry</p>
-          ) : (
-            <div className="h-px w-10 mx-auto rounded-full bg-white/10" />
-          )}
+            <p className="px-1 text-[11px] leading-snug text-zinc-600">Live profile control · Postgres API</p>
+          ) : null}
         </div>
       </motion.aside>
 

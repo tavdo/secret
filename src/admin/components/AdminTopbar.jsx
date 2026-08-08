@@ -5,24 +5,25 @@ import { Bell, Menu, Radar, Search, Sparkles } from "lucide-react";
 import { GlassPanel } from "./GlassPanel";
 import { cn } from "../lib/cn";
 import { useLivePulse } from "../hooks/useLivePulse";
-import { activityFeed } from "../data/mockAdminData";
 import { useAdminToast } from "../context/ToastContext";
+import { useAdminData } from "../context/AdminDataContext";
 
-export function AdminTopbar({ onOpenMobile }) {
+export function AdminTopbar({ onOpenMobile, onLogout }) {
   const [notifOpen, setNotifOpen] = useState(false);
-  const online = useLivePulse(487, 0.15);
+  const { activityLog, dashboardStats } = useAdminData();
+  const online = useLivePulse(dashboardStats.onlineNow || 0, 0.15);
   const { toast } = useAdminToast();
   const path = typeof window !== "undefined" ? window.location.pathname.replace(/^\//, "") : "";
 
   const inbox = useMemo(
     () =>
-      activityFeed.slice(0, 5).map((a) => ({
+      activityLog.slice(0, 5).map((a) => ({
         id: a.id,
         title: a.actor,
         sub: a.summary,
         ts: a.ts,
       })),
-    []
+    [activityLog]
   );
 
   return (
@@ -87,9 +88,11 @@ export function AdminTopbar({ onOpenMobile }) {
               aria-label="Notifications"
             >
               <Bell className="h-5 w-5 text-zinc-200" />
-              <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold px-1 text-white shadow-[0_0_12px_rgba(244,63,94,.6)]">
-                3
-              </span>
+              {inbox.length > 0 ? (
+                <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold px-1 text-white shadow-[0_0_12px_rgba(244,63,94,.6)]">
+                  {inbox.length}
+                </span>
+              ) : null}
             </motion.button>
             <AnimatePresence>
               {notifOpen && (
@@ -111,21 +114,25 @@ export function AdminTopbar({ onOpenMobile }) {
                       <Sparkles className="h-4 w-4 text-amber-300" />
                     </div>
                     <div className="max-h-[17rem] overflow-y-auto divide-y divide-white/[0.06]">
-                      {inbox.map((n) => (
-                        <button
-                          type="button"
-                          key={n.id}
-                          className="w-full text-left px-4 py-3 text-sm transition-colors hover:bg-white/[0.04]"
-                          onClick={() => {
-                            toast({ title: `${n.title}`, variant: "success" });
-                            setNotifOpen(false);
-                          }}
-                        >
-                          <p className="font-medium text-zinc-100">{n.title}</p>
-                          <p className="text-xs text-zinc-500 mt-0.5">{n.sub}</p>
-                          <p className="text-[10px] mt-2 uppercase tracking-[0.2em] text-zinc-600">{n.ts}</p>
-                        </button>
-                      ))}
+                      {inbox.length === 0 ? (
+                        <p className="px-4 py-6 text-sm text-zinc-500">No activity yet.</p>
+                      ) : (
+                        inbox.map((n) => (
+                          <button
+                            type="button"
+                            key={n.id}
+                            className="w-full text-left px-4 py-3 text-sm transition-colors hover:bg-white/[0.04]"
+                            onClick={() => {
+                              toast({ title: `${n.title}`, variant: "success" });
+                              setNotifOpen(false);
+                            }}
+                          >
+                            <p className="font-medium text-zinc-100">{n.title}</p>
+                            <p className="text-xs text-zinc-500 mt-0.5">{n.sub}</p>
+                            <p className="text-[10px] mt-2 uppercase tracking-[0.2em] text-zinc-600">{n.ts}</p>
+                          </button>
+                        ))
+                      )}
                     </div>
                   </motion.div>
                 </>
@@ -133,12 +140,22 @@ export function AdminTopbar({ onOpenMobile }) {
             </AnimatePresence>
           </div>
 
-          <Link
-            to="/"
-            className="hidden lg:inline-flex text-[10px] uppercase tracking-[0.25em] text-zinc-500 hover:text-amber-200 px-2"
-          >
-            Exit
-          </Link>
+          {onLogout ? (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="hidden lg:inline-flex text-[10px] uppercase tracking-[0.25em] text-zinc-500 hover:text-amber-200 px-2"
+            >
+              Sign out
+            </button>
+          ) : (
+            <Link
+              to="/"
+              className="hidden lg:inline-flex text-[10px] uppercase tracking-[0.25em] text-zinc-500 hover:text-amber-200 px-2"
+            >
+              Exit
+            </Link>
+          )}
         </div>
       </div>
     </GlassPanel>
