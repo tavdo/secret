@@ -19,7 +19,7 @@
       "framework": "express",
       "entrypoint": "src/vercel-entry.ts",
       "installCommand": "npm install",
-      "buildCommand": "npm run build"
+      "buildCommand": "prisma generate"
     }
   },
   "rewrites": [

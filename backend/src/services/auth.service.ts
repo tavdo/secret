@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import type { AvailabilityStatus, PrismaClient, Role } from "@prisma/client";
 import { randomBytes } from "node:crypto";
 import { prisma } from "../config/prisma.js";

@@ -1,5 +1,5 @@
 import type { AccountStatus, AvailabilityStatus, PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { createHash, randomBytes } from "node:crypto";
 import { prisma } from "../config/prisma.js";
 import { AppError } from "../utils/AppError.js";

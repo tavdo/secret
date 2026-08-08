@@ -96,7 +96,10 @@ export function AdminDataProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    refreshProfiles();
+    const timer = setTimeout(() => {
+      void refreshProfiles();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [refreshProfiles]);
 
   const addProfile = useCallback(async (payload) => {
