@@ -19,11 +19,11 @@ const PLACEHOLDERS = [
     displayName: "Nino",
     slug: "nino-batumi",
     age: 24,
-    vip: true,
+    phone: "+995555101001",
     featured: true,
     rate: 180,
     servicesText: "ვახშმი\nმოგზაურობის თანმხლები\nპირადი ღონისძიებები\nქალაქის ტურები",
-    bio: "თბილი და ელეგანტური თანმხლები ბათუმში. ხელმისწვდომია ვახშმებისთვის, ღონისძიებებისა და მოგზაურობისთვის.",
+    bio: "თბილი და ელეგანტური თანმხლები ბათუმში.",
     images: [
       "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=900&q=80",
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=80",
@@ -34,11 +34,11 @@ const PLACEHOLDERS = [
     displayName: "Mari",
     slug: "mari-batumi",
     age: 26,
-    vip: false,
+    phone: "+995555101002",
     featured: true,
     rate: 150,
-    servicesText: "ყავის შეხვედრება\nსაღამოს სარცელი\nსოციალური ღონისძიებები",
-    bio: "მეგობრი ბათუმელი, რომელიც უყვარს კარგი საუბარი და ზღვისპირია საღამოები.",
+    servicesText: "ყავის შეხვედრა\nსაღამოს გასეირნება\nსოციალური ღონისძიებები",
+    bio: "მეგობრული ბათუმელი კარგი საუბრისა და ზღვისპირა საღამოებისთვის.",
     images: [
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=80",
       "https://images.unsplash.com/photo-1524504388940-b1c17226555e?auto=format&fit=crop&w=900&q=80",
@@ -49,11 +49,11 @@ const PLACEHOLDERS = [
     displayName: "Ana",
     slug: "ana-batumi",
     age: 23,
-    vip: true,
+    phone: "+995555101003",
     featured: false,
     rate: 220,
-    servicesText: "VIP ღონისძიებები\nიახტის დღე\nვახშმის თანმხლები\nფოტოსესია",
-    bio: "VIP თანმხლები პრემიუმ საღამოებისა და პირადი შეხვედრებისთვის ბათუმში.",
+    servicesText: "ღონისძიებები\nიახტის დღე\nვახშმის თანმხლები\nფოტოსესია",
+    bio: "თანმხლები პრემიუმ საღამოებისა და პირადი შეხვედრებისთვის ბათუმში.",
     images: [
       "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&q=80",
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80",
@@ -64,11 +64,11 @@ const PLACEHOLDERS = [
     displayName: "Lika",
     slug: "lika-batumi",
     age: 28,
-    vip: false,
+    phone: "+995555101004",
     featured: false,
     rate: 140,
-    servicesText: "დღის ტურები\nშოპინგის თანმხლები\nყავის შეხვედრება",
-    bio: "მორილი და სტილური გზიდი ბათუმის ბულვარის ირგვლივ დღის გეგმებისთვის.",
+    servicesText: "დღის ტურები\nშოპინგის თანმხლები\nყავის შეხვედრა",
+    bio: "სტილური თანმხლები ბათუმის ბულვარის ირგვლივ დღის გეგმებისთვის.",
     images: [
       "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=900&q=80&sat=-20",
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=900&q=80",
@@ -79,16 +79,16 @@ const PLACEHOLDERS = [
     displayName: "Salome",
     slug: "salome-batumi",
     age: 25,
-    vip: true,
+    phone: "+995555101005",
     featured: true,
     rate: 200,
     servicesText: "პირადი ვახშმები\nმოგზაურობის თანმხლები\nკლუბის საღამოები\nბიზნეს ღონისძიებები",
-    bio: "დისკრეტული და დახვეწილი — იდეალურია კლიენტებისთვის, რომლებსაც სურვან ქომპანია ბათუმში.",
+    bio: "დისკრეტული და დახვეწილი თანმხლები ბათუმში.",
     images: [
       "https://images.unsplash.com/photo-1524504388940-b1c17226555e?auto=format&fit=crop&w=900&q=80",
       "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=900&q=80",
     ],
-  },
+  }
 ];
 
 async function upsertPlaceholder(p: (typeof PLACEHOLDERS)[number]) {
@@ -100,26 +100,31 @@ async function upsertPlaceholder(p: (typeof PLACEHOLDERS)[number]) {
     include: { profile: true },
   });
 
+  const profileData = {
+    displayName: p.displayName,
+    slug: p.slug,
+    bio: p.bio,
+    city: "Batumi",
+    age: p.age,
+    phone: p.phone,
+    avatarUrl: avatar,
+    vipBadge: false,
+    featured: p.featured,
+    active: true,
+    availability: "AVAILABLE" as const,
+    priceMin: p.rate,
+    priceMax: p.rate,
+    currency: "GEL",
+    servicesText: p.servicesText,
+    lastActiveAt: new Date(),
+  };
+
   if (existing?.profile) {
     await prisma.galleryItem.deleteMany({ where: { profileId: existing.profile.id } });
     await prisma.profile.update({
       where: { id: existing.profile.id },
       data: {
-        displayName: p.displayName,
-        slug: p.slug,
-        bio: p.bio,
-        city: "Batumi",
-        age: p.age,
-        avatarUrl: avatar,
-        vipBadge: p.vip,
-        featured: p.featured,
-        active: true,
-        availability: "AVAILABLE",
-        priceMin: p.rate,
-        priceMax: p.rate,
-        currency: "USD",
-        servicesText: p.servicesText,
-        lastActiveAt: new Date(),
+        ...profileData,
         galleryItems: {
           create: p.images.map((url, sortOrder) => ({
             url,
@@ -144,21 +149,7 @@ async function upsertPlaceholder(p: (typeof PLACEHOLDERS)[number]) {
       accountStatus: "ACTIVE",
       profile: {
         create: {
-          displayName: p.displayName,
-          slug: p.slug,
-          bio: p.bio,
-          city: "Batumi",
-          age: p.age,
-          avatarUrl: avatar,
-          vipBadge: p.vip,
-          featured: p.featured,
-          active: true,
-          availability: "AVAILABLE",
-          priceMin: p.rate,
-          priceMax: p.rate,
-          currency: "USD",
-          servicesText: p.servicesText,
-          lastActiveAt: new Date(),
+          ...profileData,
           galleryItems: {
             create: p.images.map((url, sortOrder) => ({
               url,
