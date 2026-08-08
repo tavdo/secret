@@ -168,12 +168,45 @@ async function upsertPlaceholder(p: (typeof PLACEHOLDERS)[number]) {
   return { slug: p.slug, status: "created" as const };
 }
 
+async function ensureAdmin() {
+  const email = "admin@esc.com";
+  const password = "Admin12345!";
+  const passwordHash = await bcrypt.hash(password, 12);
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    await prisma.user.update({
+      where: { id: existing.id },
+      data: {
+        passwordHash,
+        role: "ADMIN",
+        accountStatus: "ACTIVE",
+        emailVerified: true,
+        failedLoginAttempts: 0,
+        lockoutUntil: null,
+      },
+    });
+    console.log("updated: admin@esc.com");
+    return;
+  }
+  await prisma.user.create({
+    data: {
+      email,
+      passwordHash,
+      role: "ADMIN",
+      emailVerified: true,
+      accountStatus: "ACTIVE",
+    },
+  });
+  console.log("created: admin@esc.com");
+}
+
 async function main() {
+  await ensureAdmin();
   for (const p of PLACEHOLDERS) {
     const result = await upsertPlaceholder(p);
     console.log(`${result.status}: ${result.slug}`);
   }
-  console.log(`Done — ${PLACEHOLDERS.length} placeholder profiles ready.`);
+  console.log(`Done — admin + ${PLACEHOLDERS.length} placeholder profiles ready.`);
 }
 
 main()

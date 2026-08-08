@@ -9,8 +9,8 @@ export function AdminLogin() {
   const { isAuthenticated, login, bootstrap } = useAdminAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState('login'); // login | bootstrap
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@esc.com');
+  const [password, setPassword] = useState('Admin12345!');
   const [displayName, setDisplayName] = useState('Admin');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -101,7 +101,12 @@ export function AdminLogin() {
             <p className="text-xs text-zinc-500 leading-relaxed">
               ქმნის პირველ ადმინს, თუ არცერთი არ არსებობს. გამოიყენეთ ერთხელ, შემდეგ შედით ჩვეულებრივად.
             </p>
-          ) : null}
+          ) : (
+            <p className="text-xs text-zinc-500 leading-relaxed">
+              დეფოლტი: <span className="text-zinc-300">admin@esc.com</span> /{' '}
+              <span className="text-zinc-300">Admin12345!</span>
+            </p>
+          )}
 
           {error ? (
             <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
