@@ -237,7 +237,7 @@ function ProfileFormBody({ editing, onClose }) {
               <img src={form.avatar} alt="" className="w-full object-cover max-h-52" />
             </div>
           ) : null}
-          <p className="text-xs text-zinc-500">Drag tiles to reorder. First upload becomes hero if portrait empty.</p>
+          <p className="text-xs text-zinc-500">გადააადგილეთ რიგით გადალაგებისთვის.</p>
           <DraggableGallery
             urls={form.gallery}
             onReorder={(from, to) => {
@@ -275,7 +275,7 @@ function ProfileFormBody({ editing, onClose }) {
           disabled={busy}
           className="rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/90 to-yellow-700/85 px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.22em] text-black disabled:opacity-60"
         >
-          {busy ? 'Saving…' : isEdit ? 'Save changes' : 'Create profile'}
+          {busy ? 'ინახება…' : isEdit ? 'შენახვა' : 'შექმნა'}
         </motion.button>
       </div>
     </>
