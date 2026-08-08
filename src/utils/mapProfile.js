@@ -10,10 +10,10 @@ export function stripHtml(html) {
     .trim();
 }
 
-function formatRate(min, max, currency = 'USD') {
+function formatRate(min, max, currency = 'GEL') {
   const amount = min ?? max;
   if (amount == null) return 'შეთანხმებით';
-  const symbol = currency === 'GEL' || currency === '₾' ? '₾' : '$';
+  const symbol = currency === 'USD' || currency === '$' ? '$' : '₾';
   return `${symbol}${amount}/სთ`;
 }
 
@@ -59,7 +59,8 @@ export function mapProfile(raw) {
     reviews_count: raw.reviewCount ?? raw.counts?.reviews ?? 0,
     price: formatRate(raw.priceMin, raw.priceMax, raw.currency),
     priceMin: raw.priceMin,
-    currency: raw.currency || 'USD',
+    currency: raw.currency || 'GEL',
+    phone: raw.phone || '',
     is_vip: Boolean(raw.vipBadge),
     is_online: raw.availability === 'AVAILABLE',
     featured: Boolean(raw.featured),

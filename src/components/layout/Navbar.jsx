@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Menu, X, Heart } from 'lucide-react';
+import { Menu, X, Heart } from 'lucide-react';
 import Button from '../common/Button';
 
 const Navbar = () => {
@@ -10,16 +10,14 @@ const Navbar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navLinks = [
     { name: 'ძებნა', path: '/explore' },
-    { name: 'VIP', path: '/vip' },
+    { name: 'რჩეულები', path: '/favorites' },
   ];
 
   return (
@@ -39,7 +37,7 @@ const Navbar = () => {
             <span className="text-black font-bold text-xl">S</span>
           </motion.div>
           <span className="text-2xl font-['Playfair_Display'] font-bold tracking-tighter text-white">
-            SECRET<span className="text-luxury-gold">VIP</span>
+            SECRET
           </span>
         </Link>
 
@@ -58,14 +56,17 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-4">
-          <button type="button" className="p-2 text-white/70 hover:text-white transition-colors" aria-label="ძებნა">
-            <Search size={20} />
-          </button>
-          <Link to="/favorites" className="p-2 text-white/70 hover:text-white transition-colors" aria-label="რჩეულები">
+          <Link
+            to="/favorites"
+            className="p-2 text-white/70 hover:text-white transition-colors"
+            aria-label="favorites"
+          >
             <Heart size={20} />
           </Link>
           <Link to="/auth">
-            <Button variant="outline" className="py-2 px-6">შესვლა</Button>
+            <Button variant="outline" className="py-2 px-6">
+              რეგისტრაცია
+            </Button>
           </Link>
         </div>
 
@@ -73,7 +74,7 @@ const Navbar = () => {
           type="button"
           className="md:hidden p-2 text-white"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="მენიუ"
+          aria-label="menu"
         >
           {mobileMenuOpen ? <X /> : <Menu />}
         </button>
@@ -97,14 +98,9 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <div className="flex flex-col items-center gap-4 w-full px-6">
-              <Link to="/auth" className="w-full" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="w-full">დაწყება</Button>
-              </Link>
-              <Link to="/auth" className="w-full" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="outline" className="w-full">შესვლა</Button>
-              </Link>
-            </div>
+            <Link to="/auth" className="w-full px-6" onClick={() => setMobileMenuOpen(false)}>
+              <Button className="w-full">რეგისტრაცია</Button>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

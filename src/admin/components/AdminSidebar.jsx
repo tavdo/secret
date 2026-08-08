@@ -5,16 +5,12 @@ import {
   Activity,
   AlignLeft,
   BarChart3,
-  CalendarRange,
   Contact,
-  Crown,
   Images,
   LayoutDashboard,
-  MessageSquareWarning,
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
-  ShieldAlert,
   Users,
   X,
 } from 'lucide-react';
@@ -27,13 +23,9 @@ const links = [
   { to: '/admin/profiles', label: 'პროფილები', Icon: Contact },
   { to: '/admin/content', label: 'კონტენტი', Icon: AlignLeft },
   { to: '/admin/media', label: 'მედია', Icon: Images },
-  { to: '/admin/analytics', label: 'ანალიტიკა', Icon: BarChart3 },
   { to: '/admin/users', label: 'მომხმარებლები', Icon: Users },
-  { to: '/admin/bookings', label: 'ჯავშნები', Icon: CalendarRange },
-  { to: '/admin/vip', label: 'VIP და ტიერები', Icon: Crown },
-  { to: '/admin/moderation', label: 'მოდერაცია', Icon: ShieldAlert },
-  { to: '/admin/messaging', label: 'შეტყობინებები', Icon: MessageSquareWarning },
   { to: '/admin/reports', label: 'რეპორტები', Icon: Activity },
+  { to: '/admin/analytics', label: 'ანალიტიკა', Icon: BarChart3 },
 ];
 
 function NavRows({ collapsed, onNavigate }) {

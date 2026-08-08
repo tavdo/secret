@@ -1,12 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import Explore from './pages/Explore';
 import ProfileDetail from './pages/ProfileDetail';
-import Messaging from './pages/Messaging';
 import Auth from './pages/Auth';
 import Favorites from './pages/Favorites';
-import VIPOnly from './pages/VIPOnly';
 import { AdminAuthLayout } from './admin/layouts/AdminAuthLayout.jsx';
 import { AdminShell } from './admin/layouts/AdminShell';
 import { AdminLogin } from './admin/pages/AdminLogin.jsx';
@@ -15,10 +13,6 @@ import { AdminProfiles } from './admin/pages/AdminProfiles';
 import { AdminContent } from './admin/pages/AdminContent';
 import { AdminMedia } from './admin/pages/AdminMedia';
 import { AdminUsers } from './admin/pages/AdminUsers';
-import { AdminModeration } from './admin/pages/AdminModeration';
-import { AdminBookings } from './admin/pages/AdminBookings';
-import { AdminMessaging } from './admin/pages/AdminMessaging';
-import { AdminVIP } from './admin/pages/AdminVIP';
 import { AdminReports } from './admin/pages/AdminReports';
 import { AdminAnalytics } from './admin/pages/AdminAnalytics';
 
@@ -30,10 +24,10 @@ function App() {
           <Route index element={<Home />} />
           <Route path="explore" element={<Explore />} />
           <Route path="profile/:id" element={<ProfileDetail />} />
-          <Route path="messages" element={<Messaging />} />
           <Route path="favorites" element={<Favorites />} />
           <Route path="auth" element={<Auth />} />
-          <Route path="vip" element={<VIPOnly />} />
+          <Route path="messages" element={<Navigate to="/explore" replace />} />
+          <Route path="vip" element={<Navigate to="/explore" replace />} />
         </Route>
 
         <Route path="/admin" element={<AdminAuthLayout />}>
@@ -44,12 +38,12 @@ function App() {
             <Route path="content" element={<AdminContent />} />
             <Route path="media" element={<AdminMedia />} />
             <Route path="users" element={<AdminUsers />} />
-            <Route path="moderation" element={<AdminModeration />} />
-            <Route path="bookings" element={<AdminBookings />} />
-            <Route path="messaging" element={<AdminMessaging />} />
-            <Route path="vip" element={<AdminVIP />} />
             <Route path="reports" element={<AdminReports />} />
             <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="bookings" element={<Navigate to="/admin/profiles" replace />} />
+            <Route path="vip" element={<Navigate to="/admin/profiles" replace />} />
+            <Route path="messaging" element={<Navigate to="/admin/profiles" replace />} />
+            <Route path="moderation" element={<Navigate to="/admin/reports" replace />} />
           </Route>
         </Route>
       </Routes>

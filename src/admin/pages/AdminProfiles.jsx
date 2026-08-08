@@ -14,7 +14,6 @@ export function AdminProfiles() {
   const { toast } = useAdminToast();
   const [q, setQ] = useState('');
   const [city, setCity] = useState('ALL');
-  const [vipOnly, setVipOnly] = useState(false);
   const [availability, setAvailability] = useState('ALL'); // ALL | ONLINE | OFFLINE
 
   const [editorOpen, setEditorOpen] = useState(false);
@@ -35,14 +34,13 @@ export function AdminProfiles() {
         (p.handle && p.handle.toLowerCase().includes(q.toLowerCase())) ||
         p.city.toLowerCase().includes(q.toLowerCase());
       const met = city === 'ALL' || p.city === city;
-      const vip = !vipOnly || p.vip;
       const avail =
         availability === 'ALL' ||
         (availability === 'ONLINE' && p.available) ||
         (availability === 'OFFLINE' && !p.available);
-      return hit && met && vip && avail;
+      return hit && met && avail;
     });
-  }, [profiles, q, city, vipOnly, availability]);
+  }, [profiles, q, city, availability]);
 
   return (
     <div className="space-y-8 pb-28">
@@ -111,15 +109,6 @@ export function AdminProfiles() {
               </option>
             ))}
           </select>
-          <button
-            type="button"
-            onClick={() => setVipOnly((v) => !v)}
-            className={`rounded-xl border px-3 py-2 text-[11px] uppercase tracking-[0.18em] ${
-              vipOnly ? 'border-amber-400/50 bg-amber-500/15 text-amber-50' : 'border-white/10 text-zinc-500'
-            }`}
-          >
-            VIP only
-          </button>
           <select
             value={availability}
             onChange={(e) => setAvailability(e.target.value)}

@@ -18,6 +18,7 @@ type AdminProfileInput = {
   password?: string;
   age?: number | null;
   city: string;
+  phone?: string | null;
   bio?: string;
   servicesText?: string | null;
   hourlyRate?: number | null;
@@ -49,6 +50,7 @@ function toAdminProfileDto(row: {
   servicesText: string | null;
   city: string;
   age: number | null;
+  phone: string | null;
   avatarUrl: string | null;
   vipBadge: boolean;
   featured: boolean;
@@ -73,6 +75,7 @@ function toAdminProfileDto(row: {
     slug: row.slug,
     age: row.age ?? 25,
     city: row.city,
+    phone: row.phone ?? "",
     bio: row.bio,
     servicesText: row.servicesText ?? "",
     hourlyRate: rate,
@@ -197,6 +200,7 @@ export class AdminService {
             : null,
           city,
           age,
+          phone: input.phone?.trim() ? input.phone.trim().replace(/\s+/g, " ").slice(0, 40) : null,
           avatarUrl: avatar,
           vipBadge: Boolean(input.vip),
           featured: Boolean(input.featured),
@@ -204,7 +208,7 @@ export class AdminService {
           availability: input.available === false ? "OFFLINE" : "AVAILABLE",
           priceMin: rate,
           priceMax: rate,
-          currency: "USD",
+          currency: "GEL",
           galleryItems: {
             create: gallery.map((url, sortOrder) => ({
               url,
@@ -240,6 +244,11 @@ export class AdminService {
       data.displayName = displayName;
     }
     if (typeof input.city === "string") data.city = input.city.trim() || "Batumi";
+    if (typeof input.phone === "string") {
+      data.phone = input.phone.trim() ? input.phone.trim().replace(/\s+/g, " ").slice(0, 40) : null;
+    } else if (input.phone === null) {
+      data.phone = null;
+    }
     if (typeof input.bio === "string") data.bio = input.bio.trim().slice(0, 20000);
     if (typeof input.servicesText === "string") {
       data.servicesText = input.servicesText.trim().slice(0, 8000) || null;

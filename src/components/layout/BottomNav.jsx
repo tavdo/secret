@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Search, MessageSquare, User, Heart } from 'lucide-react';
+import { Home, Search, User, Heart } from 'lucide-react';
 
 const BottomNav = () => {
   const location = useLocation();
@@ -8,9 +8,8 @@ const BottomNav = () => {
   const items = [
     { icon: Home, path: '/', label: 'მთავარი' },
     { icon: Search, path: '/explore', label: 'ძებნა' },
-    { icon: MessageSquare, path: '/messages', label: 'ჩატი' },
     { icon: Heart, path: '/favorites', label: 'რჩეული' },
-    { icon: User, path: '/auth', label: 'პროფილი' },
+    { icon: User, path: '/auth', label: 'რეგისტრაცია' },
   ];
 
   return (

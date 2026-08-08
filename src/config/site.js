@@ -1,4 +1,4 @@
-/** Site contact — change WhatsApp number here. */
+/** Site contact / registration desk WhatsApp (admin). */
 export const REGISTRATION_FEE_GEL = 600;
 
 /** Digits only with country code. e.g. 9955XXXXXXXX */
@@ -7,36 +7,50 @@ export const WHATSAPP_NUMBER =
 
 export const CITY = 'ბათუმი';
 
-export function whatsappRegistrationUrl({ name, phone, email } = {}) {
+export function normalizePhoneDigits(phone) {
+  return String(phone || '').replace(/\D/g, '');
+}
+
+/** Direct call link for a provider phone. */
+export function telHref(phone) {
+  const d = normalizePhoneDigits(phone);
+  return d ? `tel:+${d}` : null;
+}
+
+/** WhatsApp chat with a specific provider. */
+export function whatsappToProfile(phone, { profileName } = {}) {
+  const d = normalizePhoneDigits(phone);
+  if (!d) return null;
+  const hello = profileName
+    ? `გამარჯობა, ${profileName}!`
+    : 'გამარჯობა!';
+  return `https://wa.me/${d}?text=${encodeURIComponent(hello)}`;
+}
+
+export function whatsappRegistrationUrl({
+  name,
+  phone,
+  email,
+  age,
+  services,
+  bio,
+  rate,
+} = {}) {
   const lines = [
     'გამარჯობა! მინდა დავრეგისტრირდე საიტზე.',
     '',
     `სახელი: ${name || '—'}`,
     `ტელეფონი: ${phone || '—'}`,
+    age ? `ასაკი: ${age}` : null,
     email ? `ელფოსტა: ${email}` : null,
     `ქალაქი: ${CITY}`,
+    rate ? `ტარიფი: ${rate}₾/სთ` : null,
+    services ? `სერვისები:\n${services}` : null,
+    bio ? `შესახებ:\n${bio}` : null,
     `რეგისტრაციის საფასური: ${REGISTRATION_FEE_GEL}₾`,
     '',
     'გთხოვთ მომწეროთ, სად გადავიხადო.',
   ].filter(Boolean);
 
-  const text = encodeURIComponent(lines.join('\n'));
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
-}
-
-/** Contact / booking via site WhatsApp. */
-export function whatsappContactUrl({ profileName, slug, intent = 'message' } = {}) {
-  const intentLine =
-    intent === 'booking'
-      ? 'მინდა ჯავშნის მოთხოვნა.'
-      : 'მინდა დავუკავშირდე პროვაიდერს.';
-  const lines = [
-    'გამარჯობა!',
-    intentLine,
-    '',
-    profileName ? `პროფილი: ${profileName}` : null,
-    slug ? `ბმული: /profile/${slug}` : null,
-    `ქალაქი: ${CITY}`,
-  ].filter(Boolean);
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join('\n'))}`;
 }

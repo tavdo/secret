@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, MapPin, ShieldCheck, Heart } from 'lucide-react';
+import { Star, MapPin, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { isFavorite, toggleFavorite } from '../../utils/favorites';
 
@@ -34,12 +34,6 @@ const ProfileCard = ({ profile }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
         <div className="absolute top-4 left-4 flex gap-2">
-          {profile.is_vip && (
-            <div className="px-2 py-1 glass-dark text-[10px] font-bold text-luxury-gold flex items-center gap-1 rounded-full uppercase tracking-widest border-luxury-gold/30">
-              <ShieldCheck size={12} />
-              VIP
-            </div>
-          )}
           {profile.is_online && (
             <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/20 backdrop-blur-md rounded-full border border-green-500/30">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />

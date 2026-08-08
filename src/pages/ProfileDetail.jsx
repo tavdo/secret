@@ -3,14 +3,14 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ChevronLeft, Star, MapPin, Heart,
-  MessageSquare, Calendar, Share2,
+  MessageSquare, Phone, Share2,
 } from 'lucide-react';
 import Button from '../components/common/Button';
 import ProfileCard from '../components/common/ProfileCard';
 import { fetchPublicProfile } from '../api/publicApi';
 import { mapProfile } from '../utils/mapProfile';
 import { useProfiles } from '../hooks/useProfiles';
-import { whatsappContactUrl } from '../config/site';
+import { telHref, whatsappToProfile } from '../config/site';
 import { isFavorite, toggleFavorite } from '../utils/favorites';
 
 const ProfileDetail = () => {
@@ -194,34 +194,29 @@ const ProfileDetail = () => {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                  <a
-                    href={whatsappContactUrl({
-                      profileName: profile.name,
-                      slug: profile.slug || profile.id,
-                      intent: 'booking',
-                    })}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full"
-                  >
-                    <Button className="w-full py-4 text-lg flex items-center justify-center gap-2">
-                      <Calendar size={20} /> ჯავშნის მოთხოვნა
+                  {telHref(profile.phone) ? (
+                    <a href={telHref(profile.phone)} className="w-full">
+                      <Button className="w-full py-4 text-lg flex items-center justify-center gap-2">
+                        <Phone size={20} /> დარეკვა
+                      </Button>
+                    </a>
+                  ) : (
+                    <Button disabled className="w-full py-4 text-lg opacity-50 cursor-not-allowed">
+                      ტელეფონი მიუწვდომელია
                     </Button>
-                  </a>
-                  <a
-                    href={whatsappContactUrl({
-                      profileName: profile.name,
-                      slug: profile.slug || profile.id,
-                      intent: 'message',
-                    })}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full"
-                  >
-                    <Button variant="outline" className="w-full py-4 flex items-center justify-center gap-2">
-                      <MessageSquare size={20} /> WhatsApp
-                    </Button>
-                  </a>
+                  )}
+                  {whatsappToProfile(profile.phone, { profileName: profile.name }) ? (
+                    <a
+                      href={whatsappToProfile(profile.phone, { profileName: profile.name })}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full"
+                    >
+                      <Button variant="outline" className="w-full py-4 flex items-center justify-center gap-2">
+                        <MessageSquare size={20} /> WhatsApp
+                      </Button>
+                    </a>
+                  ) : null}
                 </div>
 
                 <div className="mt-8 flex items-center justify-center gap-8 border-t border-white/5 pt-8">

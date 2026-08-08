@@ -100,6 +100,8 @@ model Profile {
   bio                 String               @db.Text
   city                String
   age                 Int?
+  /** Public contact number for call / WhatsApp (digits with country code preferred). */
+  phone               String?
   avatarUrl           String?
   avatarPublicId      String?
 

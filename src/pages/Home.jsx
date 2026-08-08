@@ -36,15 +36,13 @@ const Home = () => {
             transition={{ duration: 1 }}
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-luxury-gold text-xs font-bold uppercase tracking-[0.3em] mb-6">
-              <Sparkles size={14} /> ქალები, რომლებიც სერვისს სთავაზობენ ბათუმში
+              <Sparkles size={14} /> ბათუმი
             </span>
             <h1 className="text-5xl md:text-8xl mb-8 leading-tight">
-              გააუმჯობესე <br />
-              <span className="gold-text-gradient">შენი გამოცდილება</span>
+              SECRET
             </h1>
             <p className="max-w-2xl mx-auto text-lg text-white/60 mb-10 font-light leading-relaxed">
-              იპოვე ვერიფიცირებული ქალები, რომლებიც კლიენტებს თანმხლებობასა და პირად სერვისებს სთავაზობენ.
-              დისკრეცია, სიცხადე და რეალური განცხადებები — ადმინისტრაციის მართვით.
+              აირჩიე ქალი, რომელიც სერვისს სთავაზობს — ნახე პროფილი და დარეკე პირდაპირ.
             </p>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6">
               <Link to="/explore">
@@ -52,7 +50,7 @@ const Home = () => {
               </Link>
               <Link to="/auth">
                 <Button variant="ghost" className="flex items-center gap-2 group">
-                  რეგისტრაცია პროვაიდერად <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                  ქალის რეგისტრაცია <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
                 </Button>
               </Link>
             </div>
@@ -133,18 +131,18 @@ const Home = () => {
           {[
             {
               icon: ShieldCheck,
-              title: 'სრული დისკრეცია',
-              desc: 'პრივატული დათვალიერება და დაცული კომუნიკაცია თქვენი კონფიდენციალურობისთვის.',
+              title: 'აირჩიე',
+              desc: 'ნახე ქალების პროფილები, სერვისები და ტარიფები ბათუმში.',
             },
             {
               icon: Zap,
-              title: 'რეალური განცხადებები',
-              desc: 'პროფილებს ადმინისტრაცია მართავს — ტარიფები, სერვისები და ხელმისაწვდომობა აქტუალურია.',
+              title: 'დარეკე',
+              desc: 'პროფილზე დააჭირე დარეკვას ან WhatsApp-ს — პირდაპირ კონტაქტი.',
             },
             {
               icon: Star,
-              title: 'გასაგები სერვისები',
-              desc: 'თითოეული პროფილი ჩამოთვლის შეთავაზებულ სერვისებს, რომ კლიენტმა იცოდეს რას ელის.',
+              title: 'განათავსე',
+              desc: 'თუ სერვისს სთავაზობ — შეავსე ინფორმაცია და გააგზავნე რეგისტრაცია.',
             },
           ].map((item, i) => (
             <motion.div

@@ -14,9 +14,10 @@ const defaults = () => ({
   password: '',
   age: 26,
   city: 'Batumi',
+  phone: '',
   bio: '',
   servicesText: '',
-  hourlyRate: 750,
+  hourlyRate: 150,
   vip: false,
   available: true,
   hidden: false,
@@ -34,10 +35,11 @@ function sliceFromEditing(editing) {
     password: '',
     age: editing.age,
     city: editing.city || 'Batumi',
+    phone: editing.phone || '',
     bio: editing.bio,
     servicesText: editing.servicesText || '',
     hourlyRate: editing.hourlyRate,
-    vip: editing.vip,
+    vip: false,
     available: editing.available,
     hidden: editing.hidden,
     featured: editing.featured,
@@ -91,10 +93,10 @@ function ProfileFormBody({ editing, onClose }) {
           handle: form.handle,
           age: form.age,
           city: form.city,
+          phone: form.phone,
           bio: form.bio,
           servicesText: form.servicesText,
           hourlyRate: form.hourlyRate,
-          vip: form.vip,
           available: form.available,
           hidden: form.hidden,
           featured: form.featured,
@@ -198,11 +200,20 @@ function ProfileFormBody({ editing, onClose }) {
                 <option value="Batumi">ბათუმი</option>
               </select>
             </Field>
+            <Field label="ტელეფონი / WhatsApp">
+              <input
+                type="tel"
+                className={inputCls}
+                placeholder="+995 5XX XX XX XX"
+                value={form.phone}
+                onChange={(e) => set({ phone: e.target.value })}
+              />
+            </Field>
           </div>
-          <Field label="საათობრივი ტარიფი (USD)">
+          <Field label="საათობრივი ტარიფი (₾)">
             <input
               type="number"
-              step={50}
+              step={10}
               className={inputCls}
               value={form.hourlyRate}
               onChange={(e) => set({ hourlyRate: Number(e.target.value) || 0 })}
@@ -210,7 +221,6 @@ function ProfileFormBody({ editing, onClose }) {
           </Field>
 
           <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
-            <Toggle label="VIP" checked={form.vip} onChange={(v) => set({ vip: v })} />
             <Toggle label="ხელმისაწვდომი" checked={form.available} onChange={(v) => set({ available: v })} />
             <Toggle label="დამალული" checked={form.hidden} onChange={(v) => set({ hidden: v })} />
             <Toggle label="მთავარ გვერდზე" checked={form.featured} onChange={(v) => set({ featured: v })} />

@@ -9,7 +9,7 @@ const Explore = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { profiles, loading, error } = useProfiles({ city: 'Batumi', sort: 'trending', take: 60 });
 
-  const categories = ['ყველა', 'ხელმისაწვდომი', 'მხოლოდ VIP', 'რჩეული'];
+  const categories = ['ყველა', 'ხელმისაწვდომი'];
 
   const filteredProfiles = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -18,9 +18,7 @@ const Explore = () => {
       const matchesSearch = !q || hay.includes(q);
       const matchesCategory =
         activeCategory === 'ყველა' ||
-        (activeCategory === 'მხოლოდ VIP' && profile.is_vip) ||
-        (activeCategory === 'ხელმისაწვდომი' && profile.is_online) ||
-        (activeCategory === 'რჩეული' && profile.featured);
+        (activeCategory === 'ხელმისაწვდომი' && profile.is_online);
       return matchesSearch && matchesCategory;
     });
   }, [profiles, searchQuery, activeCategory]);
