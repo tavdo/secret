@@ -111,7 +111,6 @@ export function AdminOverview() {
       <div className="flex flex-wrap gap-2">
         {[
           { to: '/admin/profiles', label: 'Profiles', Icon: Cpu },
-          { to: '/admin/pricing', label: 'Pricing', Icon: Landmark },
           { to: '/admin/content', label: 'Content CMS', Icon: Sparkles },
           { to: '/admin/bookings', label: 'Bookings', Icon: Timer },
           { to: '/admin/media', label: 'Vault', Icon: Layers },

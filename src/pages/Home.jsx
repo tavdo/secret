@@ -1,25 +1,27 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, EffectCoverflow } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-coverflow';
-import { VIP_PROFILES } from '../data/mockData';
 import ProfileCard from '../components/common/ProfileCard';
 import Button from '../components/common/Button';
+import { useProfiles } from '../hooks/useProfiles';
 import { Sparkles, ArrowRight, ShieldCheck, Zap, Star } from 'lucide-react';
 
 const Home = () => {
+  const { profiles, loading } = useProfiles({ city: 'Batumi', sort: 'trending', take: 12 });
+
   return (
     <div className="overflow-hidden">
-      {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center pt-20">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-black/60 z-10" />
-          <video 
-            autoPlay 
-            loop 
-            muted 
+          <video
+            autoPlay
+            loop
+            muted
             playsInline
             className="w-full h-full object-cover"
           >
@@ -34,35 +36,38 @@ const Home = () => {
             transition={{ duration: 1 }}
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-luxury-gold text-xs font-bold uppercase tracking-[0.3em] mb-6">
-              <Sparkles size={14} /> The World's Most Exclusive Marketplace
+              <Sparkles size={14} /> Women offering services in Batumi
             </span>
             <h1 className="text-5xl md:text-8xl mb-8 leading-tight">
               Elevate Your <br />
               <span className="gold-text-gradient">Experience</span>
             </h1>
             <p className="max-w-2xl mx-auto text-lg text-white/60 mb-10 font-light leading-relaxed">
-              Connect with elite companions who redefine luxury. Unparalleled sophistication, 
-              absolute discretion, and unforgettable moments await you.
+              Browse verified women who offer companionship and personal services to clients.
+              Discretion, clarity, and real listings — managed from the admin panel.
             </p>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-              <Button className="px-10 py-5 text-lg">Explore VIP Profiles</Button>
-              <Button variant="ghost" className="flex items-center gap-2 group">
-                Become a Member <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
-              </Button>
+              <Link to="/explore">
+                <Button className="px-10 py-5 text-lg">Explore Profiles</Button>
+              </Link>
+              <Link to="/auth">
+                <Button variant="ghost" className="flex items-center gap-2 group">
+                  Register as Provider <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                </Button>
+              </Link>
             </div>
           </motion.div>
         </div>
 
-        {/* Hero Stats */}
         <div className="absolute bottom-10 left-0 w-full z-20 hidden md:block">
           <div className="container mx-auto px-6 flex justify-between items-end">
             <div className="flex gap-12">
               {[
-                { label: 'VIP Models', value: String(VIP_PROFILES.length) },
+                { label: 'Active listings', value: loading ? '…' : String(profiles.length) },
                 { label: 'City', value: 'Batumi' },
-                { label: 'Listings', value: 'Live' },
+                { label: 'Status', value: 'Live' },
               ].map((stat, i) => (
-                <motion.div 
+                <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -77,19 +82,24 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Trending Section */}
       <section className="py-24 bg-luxury-dark relative">
         <div className="container mx-auto px-6 mb-12 flex items-end justify-between">
           <div>
-            <h2 className="text-4xl mb-2">Trending <span className="text-luxury-gold">VIPs</span></h2>
-            <p className="text-white/40">The most sought-after companions of the week.</p>
+            <h2 className="text-4xl mb-2">Featured <span className="text-luxury-gold">Companions</span></h2>
+            <p className="text-white/40">Women currently offering services to clients in Batumi.</p>
           </div>
-          <Button variant="outline" className="hidden md:flex">View All</Button>
+          <Link to="/explore" className="hidden md:block">
+            <Button variant="outline">View All</Button>
+          </Link>
         </div>
 
         <div className="px-6 md:px-0">
-          {VIP_PROFILES.length === 0 ? (
-            <p className="text-center text-white/40 py-16">No VIP profiles yet. Add listings from the admin panel.</p>
+          {loading ? (
+            <p className="text-center text-white/40 py-16">Loading profiles…</p>
+          ) : profiles.length === 0 ? (
+            <p className="text-center text-white/40 py-16">
+              No active listings yet. Add women from the admin panel and they will appear here.
+            </p>
           ) : (
             <Swiper
               modules={[Autoplay, Pagination, EffectCoverflow]}
@@ -108,7 +118,7 @@ const Home = () => {
               pagination={{ clickable: true }}
               className="vip-swiper pb-20"
             >
-              {VIP_PROFILES.map((profile) => (
+              {profiles.map((profile) => (
                 <SwiperSlide key={profile.id} className="max-w-[350px]">
                   <ProfileCard profile={profile} />
                 </SwiperSlide>
@@ -118,24 +128,23 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features/Trust Section */}
       <section className="py-24 glass-dark border-y border-white/5">
         <div className="container mx-auto px-6 grid md:grid-cols-3 gap-12">
           {[
-            { 
-              icon: ShieldCheck, 
-              title: 'Total Discretion', 
-              desc: 'Encrypted communications and anonymous payment methods for your privacy.' 
+            {
+              icon: ShieldCheck,
+              title: 'Total Discretion',
+              desc: 'Private browsing and encrypted messaging options for your privacy.',
             },
-            { 
-              icon: Zap, 
-              title: 'Verified Only', 
-              desc: 'Every profile undergoes a rigorous 3-step verification process for your safety.' 
+            {
+              icon: Zap,
+              title: 'Real Listings',
+              desc: 'Profiles are managed by admins — rates, services, and availability stay current.',
             },
-            { 
-              icon: Star, 
-              title: 'Concierge Service', 
-              desc: 'Dedicated 24/7 support to ensure every detail of your meeting is perfect.' 
+            {
+              icon: Star,
+              title: 'Clear Services',
+              desc: 'Each companion lists the services she offers so clients know what to expect.',
             },
           ].map((item, i) => (
             <motion.div
@@ -155,17 +164,6 @@ const Home = () => {
           ))}
         </div>
       </section>
-
-      {/* Floating CTA */}
-      <motion.div 
-        initial={{ x: 100 }}
-        animate={{ x: 0 }}
-        className="fixed right-6 bottom-24 md:bottom-10 z-40 hidden md:block"
-      >
-        <Button className="rounded-full w-14 h-14 p-0 flex items-center justify-center shadow-2xl">
-          <Zap size={24} fill="currentColor" />
-        </Button>
-      </motion.div>
     </div>
   );
 };

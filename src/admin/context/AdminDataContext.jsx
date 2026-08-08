@@ -37,7 +37,6 @@ export function AdminDataProvider({ children }) {
   const [profilesError, setProfilesError] = useState('');
   const [bookings, setBookings] = useState(() => stored?.bookings ?? []);
   const [usersList, setUsersList] = useState(() => stored?.usersList ?? []);
-  const [pricingPackages, setPricingPackages] = useState(() => stored?.pricingPackages ?? []);
   const [vipTiers, setVipTiers] = useState(() => stored?.vipTiers ?? []);
   const [vipSubscriptions, setVipSubscriptions] = useState(() => stored?.vipSubscriptions ?? []);
   const [mediaLibrary, setMediaLibrary] = useState(() => stored?.mediaLibrary ?? []);
@@ -58,7 +57,6 @@ export function AdminDataProvider({ children }) {
     persist({
       bookings,
       usersList,
-      pricingPackages,
       vipTiers,
       vipSubscriptions,
       mediaLibrary,
@@ -68,7 +66,6 @@ export function AdminDataProvider({ children }) {
     persist,
     bookings,
     usersList,
-    pricingPackages,
     vipTiers,
     vipSubscriptions,
     mediaLibrary,
@@ -111,6 +108,7 @@ export function AdminDataProvider({ children }) {
       age: payload.age,
       city: payload.city || 'Batumi',
       bio: payload.bio,
+      servicesText: payload.servicesText,
       hourlyRate: payload.hourlyRate,
       vip: Boolean(payload.vip),
       available: payload.available !== false,
@@ -188,25 +186,6 @@ export function AdminDataProvider({ children }) {
       prev.map((u) => (u.id === id ? { ...u, status: 'ACTIVE' } : u))
     );
     pushActivity('user', id, 'Account cleared to active status');
-  }, [pushActivity]);
-
-  const upsertPricingPackage = useCallback(
-    (row) => {
-      setPricingPackages((prev) => {
-        const ix = prev.findIndex((p) => p.id === row.id);
-        if (ix === -1) return [...prev, { ...row, id: row.id || genId('pkg') }];
-        const clone = [...prev];
-        clone[ix] = { ...clone[ix], ...row };
-        return clone;
-      });
-      pushActivity('pricing', row.name, 'Yield table adjusted');
-    },
-    [pushActivity]
-  );
-
-  const deletePricingPackage = useCallback((id) => {
-    setPricingPackages((prev) => prev.filter((p) => p.id !== id));
-    pushActivity('pricing', id, 'Package sunset');
   }, [pushActivity]);
 
   const upsertVipTier = useCallback((row) => {
@@ -313,7 +292,6 @@ export function AdminDataProvider({ children }) {
       refreshProfiles,
       bookings,
       users: usersList,
-      pricingPackages,
       vipTiers,
       vipSubscriptions,
       mediaLibrary,
@@ -328,8 +306,6 @@ export function AdminDataProvider({ children }) {
       unbanUser,
       suspendUser,
       resetUserStatus,
-      upsertPricingPackage,
-      deletePricingPackage,
       upsertVipTier,
       deleteVipTier,
       toggleVipSubStatus,
@@ -347,7 +323,6 @@ export function AdminDataProvider({ children }) {
       refreshProfiles,
       bookings,
       usersList,
-      pricingPackages,
       vipTiers,
       vipSubscriptions,
       mediaLibrary,
@@ -362,8 +337,6 @@ export function AdminDataProvider({ children }) {
       unbanUser,
       suspendUser,
       resetUserStatus,
-      upsertPricingPackage,
-      deletePricingPackage,
       upsertVipTier,
       deleteVipTier,
       toggleVipSubStatus,

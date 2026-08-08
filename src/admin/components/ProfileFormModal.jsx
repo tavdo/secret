@@ -15,6 +15,7 @@ const defaults = () => ({
   age: 26,
   city: 'Batumi',
   bio: '',
+  servicesText: '',
   hourlyRate: 750,
   vip: false,
   available: true,
@@ -34,6 +35,7 @@ function sliceFromEditing(editing) {
     age: editing.age,
     city: editing.city || 'Batumi',
     bio: editing.bio,
+    servicesText: editing.servicesText || '',
     hourlyRate: editing.hourlyRate,
     vip: editing.vip,
     available: editing.available,
@@ -90,6 +92,7 @@ function ProfileFormBody({ editing, onClose }) {
           age: form.age,
           city: form.city,
           bio: form.bio,
+          servicesText: form.servicesText,
           hourlyRate: form.hourlyRate,
           vip: form.vip,
           available: form.available,
@@ -211,6 +214,15 @@ function ProfileFormBody({ editing, onClose }) {
             <Toggle label="Hide listing" checked={form.hidden} onChange={(v) => set({ hidden: v })} />
             <Toggle label="Feature homepage" checked={form.featured} onChange={(v) => set({ featured: v })} />
           </div>
+
+          <Field label="Services offered (one per line or comma-separated)">
+            <textarea
+              className={`${inputCls} min-h-[110px] resize-y`}
+              placeholder="Dinner dates, travel companion, private events…"
+              value={form.servicesText}
+              onChange={(e) => set({ servicesText: e.target.value })}
+            />
+          </Field>
 
           <Field label="Biography (rich text CMS)">
             <RichTextBioEditor value={form.bio} onChange={(html) => set({ bio: html })} />

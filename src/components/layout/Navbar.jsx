@@ -20,7 +20,6 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Explore', path: '/explore' },
     { name: 'VIP Only', path: '/vip' },
-    { name: 'Pricing', path: '/pricing' },
   ];
 
   return (

@@ -3,10 +3,6 @@ export function seedProfiles() {
   return [];
 }
 
-export function seedPricingPackages() {
-  return [];
-}
-
 export function seedVipTiers() {
   return [];
 }

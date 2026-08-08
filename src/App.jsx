@@ -7,13 +7,11 @@ import Messaging from './pages/Messaging';
 import Auth from './pages/Auth';
 import Favorites from './pages/Favorites';
 import VIPOnly from './pages/VIPOnly';
-import Pricing from './pages/Pricing';
 import { AdminAuthLayout } from './admin/layouts/AdminAuthLayout.jsx';
 import { AdminShell } from './admin/layouts/AdminShell';
 import { AdminLogin } from './admin/pages/AdminLogin.jsx';
 import { AdminOverview } from './admin/pages/AdminOverview';
 import { AdminProfiles } from './admin/pages/AdminProfiles';
-import { AdminPricing } from './admin/pages/AdminPricing';
 import { AdminContent } from './admin/pages/AdminContent';
 import { AdminMedia } from './admin/pages/AdminMedia';
 import { AdminUsers } from './admin/pages/AdminUsers';
@@ -36,7 +34,6 @@ function App() {
           <Route path="favorites" element={<Favorites />} />
           <Route path="auth" element={<Auth />} />
           <Route path="vip" element={<VIPOnly />} />
-          <Route path="pricing" element={<Pricing />} />
         </Route>
 
         <Route path="/admin" element={<AdminAuthLayout />}>
@@ -44,7 +41,6 @@ function App() {
           <Route element={<AdminShell />}>
             <Route index element={<AdminOverview />} />
             <Route path="profiles" element={<AdminProfiles />} />
-            <Route path="pricing" element={<AdminPricing />} />
             <Route path="content" element={<AdminContent />} />
             <Route path="media" element={<AdminMedia />} />
             <Route path="users" element={<AdminUsers />} />

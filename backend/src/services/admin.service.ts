@@ -14,6 +14,7 @@ type AdminProfileInput = {
   age?: number | null;
   city: string;
   bio?: string;
+  servicesText?: string | null;
   hourlyRate?: number | null;
   vip?: boolean;
   available?: boolean;
@@ -40,6 +41,7 @@ function toAdminProfileDto(row: {
   displayName: string;
   slug: string;
   bio: string;
+  servicesText: string | null;
   city: string;
   age: number | null;
   avatarUrl: string | null;
@@ -67,6 +69,7 @@ function toAdminProfileDto(row: {
     age: row.age ?? 25,
     city: row.city,
     bio: row.bio,
+    servicesText: row.servicesText ?? "",
     hourlyRate: rate,
     vip: row.vipBadge,
     available: row.availability === "AVAILABLE",
@@ -182,6 +185,9 @@ export class AdminService {
           displayName,
           slug,
           bio,
+          servicesText: input.servicesText?.trim()
+            ? input.servicesText.trim().slice(0, 8000)
+            : null,
           city,
           age,
           avatarUrl: avatar,
@@ -228,6 +234,11 @@ export class AdminService {
     }
     if (typeof input.city === "string") data.city = input.city.trim() || "Batumi";
     if (typeof input.bio === "string") data.bio = input.bio.trim().slice(0, 20000);
+    if (typeof input.servicesText === "string") {
+      data.servicesText = input.servicesText.trim().slice(0, 8000) || null;
+    } else if (input.servicesText === null) {
+      data.servicesText = null;
+    }
     if (typeof input.vip === "boolean") data.vipBadge = input.vip;
     if (typeof input.featured === "boolean") data.featured = input.featured;
     if (typeof input.hidden === "boolean") data.active = !input.hidden;

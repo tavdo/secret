@@ -1,4 +1,4 @@
-/** Public site contact & pricing — edit WhatsApp number here. */
+/** Public site contact — edit WhatsApp number here. */
 export const REGISTRATION_FEE_GEL = 600;
 
 /** Digits only with country code, no + or spaces. Example: 9955XXXXXXXX */

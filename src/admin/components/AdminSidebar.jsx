@@ -6,7 +6,6 @@ import {
   AlignLeft,
   BarChart3,
   CalendarRange,
-  Coins,
   Contact,
   Crown,
   Images,
@@ -26,7 +25,6 @@ const STORAGE = 'admin-sidebar-collapsed';
 const links = [
   { to: '/admin', end: true, label: 'Overview', Icon: LayoutDashboard },
   { to: '/admin/profiles', label: 'Profiles', Icon: Contact },
-  { to: '/admin/pricing', label: 'Pricing', Icon: Coins },
   { to: '/admin/content', label: 'Content', Icon: AlignLeft },
   { to: '/admin/media', label: 'Media', Icon: Images },
   { to: '/admin/analytics', label: 'Analytics', Icon: BarChart3 },

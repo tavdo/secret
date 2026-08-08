@@ -135,6 +135,7 @@ export class ProfileService {
       displayName: p.displayName,
       bio: p.bio,
       city: p.city,
+      age: p.age,
       avatarUrl: p.avatarUrl,
       verificationStatus: p.verificationStatus,
       vipBadge: p.vipBadge,
