@@ -12,14 +12,18 @@ import {
   MessageCircle,
   Banknote,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../components/common/Button';
 import {
   CITY,
   REGISTRATION_FEE_GEL,
   whatsappRegistrationUrl,
 } from '../config/site';
+import { loginUser, requestPasswordReset } from '../api/publicAuth';
+import { loginAdmin } from '../admin/api/adminApi';
 
 const Auth = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
@@ -27,6 +31,8 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
+  const [busy, setBusy] = useState(false);
 
   const openWhatsAppRegistration = (e) => {
     e.preventDefault();
@@ -48,6 +54,52 @@ const Auth = () => {
       '_blank',
       'noopener,noreferrer'
     );
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    setInfo('');
+    if (!email.trim() || !password) {
+      setError('შეიყვანეთ ელფოსტა და პაროლი.');
+      return;
+    }
+    setBusy(true);
+    try {
+      try {
+        await loginAdmin(email.trim(), password);
+        navigate('/admin');
+      } catch (adminErr) {
+        if (adminErr?.code === 'NOT_ADMIN') {
+          await loginUser(email.trim(), password);
+          navigate('/explore');
+        } else {
+          throw adminErr;
+        }
+      }
+    } catch (err) {
+      setError(err?.response?.data?.error || err?.message || 'შესვლა ვერ მოხერხდა');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setError('');
+    setInfo('');
+    if (!email.trim()) {
+      setError('პაროლის აღსადგენად შეიყვანეთ ელფოსტა.');
+      return;
+    }
+    setBusy(true);
+    try {
+      await requestPasswordReset(email.trim());
+      setInfo('თუ ანგარიში არსებობს, აღდგენის ბმული გაიგზავნება ელფოსტაზე.');
+    } catch (err) {
+      setError(err?.response?.data?.error || err?.message || 'მოთხოვნა ვერ გაიგზავნა');
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -105,7 +157,7 @@ const Auth = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: isLogin ? 20 : -20 }}
               className="space-y-5"
-              onSubmit={isLogin ? (e) => e.preventDefault() : openWhatsAppRegistration}
+              onSubmit={isLogin ? handleLogin : openWhatsAppRegistration}
             >
               {!isLogin && (
                 <>
@@ -180,7 +232,12 @@ const Auth = () => {
                     <label className="text-xs font-bold text-white/60 uppercase tracking-widest">
                       პაროლი
                     </label>
-                    <button type="button" className="text-[10px] text-luxury-gold hover:underline">
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={handleForgotPassword}
+                      className="text-[10px] text-luxury-gold hover:underline disabled:opacity-50"
+                    >
                       დაგავიწყდათ?
                     </button>
                   </div>
@@ -209,10 +266,19 @@ const Auth = () => {
                   {error}
                 </p>
               ) : null}
+              {info ? (
+                <p className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100">
+                  {info}
+                </p>
+              ) : null}
 
               {isLogin ? (
-                <Button className="w-full py-4 text-lg flex items-center justify-center gap-2">
-                  შესვლა
+                <Button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full py-4 text-lg flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                  {busy ? 'მიმდინარეობს…' : 'შესვლა'}
                   <ArrowRight size={20} />
                 </Button>
               ) : (

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getStoredUserSession } from './publicAuth';
 
 const API_BASE =
   import.meta.env.VITE_API_BASE ??
@@ -10,6 +11,14 @@ export const publicApi = axios.create({
     Accept: 'application/json',
   },
   timeout: 25_000,
+});
+
+publicApi.interceptors.request.use((config) => {
+  const session = getStoredUserSession();
+  if (session?.accessToken) {
+    config.headers.Authorization = `Bearer ${session.accessToken}`;
+  }
+  return config;
 });
 
 /** Discover active provider profiles (women offering services). */

@@ -1,4 +1,9 @@
-import type { AccountStatus, AvailabilityStatus, PrismaClient } from "@prisma/client";
+import type {
+  AccountStatus,
+  AvailabilityStatus,
+  BookingStatus,
+  PrismaClient,
+} from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { createHash, randomBytes } from "node:crypto";
 import { prisma } from "../config/prisma.js";
@@ -163,10 +168,12 @@ export class AdminService {
         : null;
 
     const passwordHash = await bcrypt.hash(password, 12);
+    const isHttpUrl = (u: string) => /^https?:\/\//i.test(u);
     const gallery = Array.isArray(input.gallery)
-      ? input.gallery.map((u) => String(u).trim()).filter(Boolean)
+      ? input.gallery.map((u) => String(u).trim()).filter((u) => u && isHttpUrl(u))
       : [];
-    const avatar = input.avatar?.trim() || gallery[0] || null;
+    const avatarRaw = input.avatar?.trim() || gallery[0] || null;
+    const avatar = avatarRaw && isHttpUrl(avatarRaw) ? avatarRaw : gallery[0] || null;
 
     const created = await this.db.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -246,7 +253,8 @@ export class AdminService {
       data.availability = input.available ? "AVAILABLE" : "OFFLINE";
     }
     if (typeof input.avatar === "string") {
-      data.avatarUrl = input.avatar.trim() || null;
+      const nextAvatar = input.avatar.trim();
+      data.avatarUrl = nextAvatar && /^https?:\/\//i.test(nextAvatar) ? nextAvatar : null;
     }
     if (typeof input.hourlyRate === "number" && Number.isFinite(input.hourlyRate)) {
       const rate = Math.max(0, Math.round(input.hourlyRate));
@@ -272,7 +280,10 @@ export class AdminService {
 
     const updated = await this.db.$transaction(async (tx) => {
       if (Array.isArray(input.gallery)) {
-        const gallery = input.gallery.map((u) => String(u).trim()).filter(Boolean);
+        const isHttpUrl = (u: string) => /^https?:\/\//i.test(u);
+        const gallery = input.gallery
+          .map((u) => String(u).trim())
+          .filter((u) => u && isHttpUrl(u));
         await tx.galleryItem.deleteMany({ where: { profileId } });
         if (gallery.length) {
           await tx.galleryItem.createMany({
@@ -290,6 +301,9 @@ export class AdminService {
         if (!("avatarUrl" in data) && gallery[0]) {
           data.avatarUrl = gallery[0];
         }
+      }
+      if (typeof data.avatarUrl === "string" && data.avatarUrl && !/^https?:\/\//i.test(data.avatarUrl)) {
+        data.avatarUrl = null;
       }
 
       return tx.profile.update({
@@ -497,28 +511,150 @@ export class AdminService {
       return created;
     });
 
+    return this.db.vipSubscription.findUnique({
+      where: { id: sub.id },
+      include: {
+        profile: {
+          select: { id: true, displayName: true, slug: true, vipBadge: true, city: true },
+        },
+      },
+    });
+  }
+
+  async listBookings(takeRaw: number, status?: string) {
+    const take = Math.min(Math.max(takeRaw, 1), 200);
+    const rows = await this.db.booking.findMany({
+      where: status ? { status: status as BookingStatus } : undefined,
+      orderBy: { createdAt: "desc" },
+      take,
+      include: {
+        client: {
+          select: {
+            id: true,
+            email: true,
+            profile: { select: { displayName: true, city: true } },
+          },
+        },
+        provider: {
+          select: {
+            id: true,
+            email: true,
+            profile: {
+              select: { displayName: true, city: true, priceMin: true, currency: true },
+            },
+          },
+        },
+      },
+    });
+    return { items: rows };
+  }
+
+  async listVipSubscriptions(takeRaw: number) {
+    const take = Math.min(Math.max(takeRaw, 1), 200);
+    const rows = await this.db.vipSubscription.findMany({
+      orderBy: { validUntil: "desc" },
+      take,
+      include: {
+        profile: {
+          select: {
+            id: true,
+            displayName: true,
+            slug: true,
+            vipBadge: true,
+            city: true,
+          },
+        },
+      },
+    });
+    return { items: rows };
+  }
+
+  async updateVipSubscription(
+    id: string,
+    input: { active?: boolean; planName?: string }
+  ) {
+    const data: { active?: boolean; planName?: string } = {};
+    if (typeof input.active === "boolean") data.active = input.active;
+    if (typeof input.planName === "string" && input.planName.trim()) {
+      data.planName = input.planName.trim();
+    }
+    if (!Object.keys(data).length) throw new AppError("Nothing to update", 400);
+
+    const sub = await this.db.vipSubscription.update({
+      where: { id },
+      data,
+      include: {
+        profile: {
+          select: { id: true, displayName: true, slug: true, vipBadge: true },
+        },
+      },
+    });
+
+    if (typeof input.active === "boolean") {
+      await this.db.profile.update({
+        where: { id: sub.profileId },
+        data: { vipBadge: input.active },
+      });
+    }
+
     return sub;
   }
 
   async analyticsSnapshot() {
-    const [users, providers, bookingGroups, unreadReports] = await Promise.all([
-      this.db.user.count(),
-      this.db.user.count({ where: { role: "PROVIDER" } }),
-      this.db.booking.groupBy({
-        by: ["status"],
-        _count: { status: true },
-      }),
-      this.db.report.count({ where: { status: "OPEN" } }),
-    ]);
+    const since = new Date();
+    since.setDate(since.getDate() - 30);
+
+    const [users, providers, bookingGroups, unreadReports, vipActive, recentBookings, recentUsers] =
+      await Promise.all([
+        this.db.user.count(),
+        this.db.user.count({ where: { role: "PROVIDER" } }),
+        this.db.booking.groupBy({
+          by: ["status"],
+          _count: { status: true },
+        }),
+        this.db.report.count({ where: { status: "OPEN" } }),
+        this.db.vipSubscription.count({ where: { active: true } }),
+        this.db.booking.findMany({
+          where: { createdAt: { gte: since } },
+          select: { createdAt: true, status: true },
+          orderBy: { createdAt: "asc" },
+        }),
+        this.db.user.findMany({
+          where: { createdAt: { gte: since } },
+          select: { createdAt: true },
+          orderBy: { createdAt: "asc" },
+        }),
+      ]);
+
+    const dayKey = (d: Date) => d.toISOString().slice(0, 10);
+    const bookingByDay = new Map<string, { day: string; total: number; confirmed: number }>();
+    for (const b of recentBookings) {
+      const key = dayKey(b.createdAt);
+      const row = bookingByDay.get(key) || { day: key, total: 0, confirmed: 0 };
+      row.total += 1;
+      if (b.status === "ACCEPTED" || b.status === "COMPLETED") row.confirmed += 1;
+      bookingByDay.set(key, row);
+    }
+
+    const usersByDay = new Map<string, { week: string; users: number }>();
+    for (const u of recentUsers) {
+      const key = dayKey(u.createdAt);
+      const row = usersByDay.get(key) || { week: key, users: 0 };
+      row.users += 1;
+      usersByDay.set(key, row);
+    }
 
     return {
       users,
       providers,
+      vipActive,
       unreadReports,
       bookingsByStatus: bookingGroups.map((row) => ({
         status: row.status,
         count: row._count.status,
       })),
+      bookingTrends: [...bookingByDay.values()],
+      userGrowth: [...usersByDay.values()],
     };
   }
 

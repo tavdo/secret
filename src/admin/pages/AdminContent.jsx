@@ -70,18 +70,26 @@ function ContentStudioBridge({ profileId }) {
     );
   }
 
-  const save = () => {
-    const before = new Set(profile.gallery || []);
-    updateProfile(profile.id, { bio, gallery });
-    gallery.forEach((u) => {
-      if (!before.has(u))
-        addMedia({
-          url: u,
-          profileId: profile.id,
-          label: `${profile.displayName} CMS slide`,
-        });
-    });
-    toast({ title: 'Narrative published', variant: 'success' });
+  const save = async () => {
+    try {
+      const safeGallery = gallery.filter((u) => /^https?:\/\//i.test(u));
+      const before = new Set(profile.gallery || []);
+      await updateProfile(profile.id, { bio, gallery: safeGallery });
+      safeGallery.forEach((u) => {
+        if (!before.has(u))
+          addMedia({
+            url: u,
+            profileId: profile.id,
+            label: `${profile.displayName} CMS slide`,
+          });
+      });
+      toast({ title: 'შენახულია', variant: 'success' });
+    } catch (err) {
+      toast({
+        title: err?.response?.data?.error || err?.message || 'შენახვა ვერ მოხერხდა',
+        variant: 'danger',
+      });
+    }
   };
 
   const resetDraft = () => {

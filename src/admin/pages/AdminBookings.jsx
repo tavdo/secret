@@ -26,16 +26,23 @@ export function AdminBookings() {
   const pc = Math.max(1, Math.ceil(filt.length / ps));
   const rows = filt.slice((page - 1) * ps, page * ps);
 
-  const act = (b, action) => {
-    if (action === "approve") {
-      setBookingStatus(b.id, "ACCEPTED");
-      toast({ title: `${b.id} accepted`, variant: "success" });
-    } else if (action === "reject") {
-      setBookingStatus(b.id, "REJECTED");
-      toast({ title: `${b.id} rejected`, variant: "warn" });
-    } else if (action === "complete") {
-      setBookingStatus(b.id, "COMPLETED");
-      toast({ title: `${b.id} settled`, variant: "success" });
+  const act = async (b, action) => {
+    try {
+      if (action === "approve") {
+        await setBookingStatus(b.id, "ACCEPTED");
+        toast({ title: `${b.id.slice(0, 8)}… accepted`, variant: "success" });
+      } else if (action === "reject") {
+        await setBookingStatus(b.id, "REJECTED");
+        toast({ title: `${b.id.slice(0, 8)}… rejected`, variant: "warn" });
+      } else if (action === "complete") {
+        await setBookingStatus(b.id, "COMPLETED");
+        toast({ title: `${b.id.slice(0, 8)}… settled`, variant: "success" });
+      }
+    } catch (err) {
+      toast({
+        title: err?.response?.data?.error || err?.message || "Booking update failed",
+        variant: "danger",
+      });
     }
   };
 
@@ -45,7 +52,7 @@ export function AdminBookings() {
         <div>
           <h1 className="text-4xl font-semibold tracking-tight text-white">Booking operations</h1>
           <p className="text-sm text-zinc-500 mt-2">
-            Sovereign adjudication rails — Axios ready on <code className="text-amber-200/90">PATCH /bookings/:id</code>.
+            Live queue from <code className="text-amber-200/90">GET /admin/bookings</code>.
           </p>
         </div>
         <select

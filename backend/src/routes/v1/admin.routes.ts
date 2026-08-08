@@ -60,18 +60,18 @@ adminRouter.post(
   [
     body("displayName").trim().isLength({ min: 2, max: 120 }),
     body("handle").optional().isString(),
-    body("email").optional().trim().isEmail(),
-    body("password").optional().isString().isLength({ min: 10, max: 128 }),
-    body("age").optional().isInt({ min: 18, max: 120 }),
+    body("email").optional({ values: "falsy" }).trim().isEmail(),
+    body("password").optional({ values: "falsy" }).isString().isLength({ min: 10, max: 128 }),
+    body("age").optional({ values: "falsy" }).isInt({ min: 18, max: 120 }),
     body("city").trim().isLength({ min: 1, max: 120 }),
     body("bio").optional().isString(),
     body("servicesText").optional({ nullable: true }).isString(),
-    body("hourlyRate").optional().isInt({ min: 0, max: 1_000_000 }),
+    body("hourlyRate").optional({ values: "falsy" }).isInt({ min: 0, max: 1_000_000 }),
     body("vip").optional().isBoolean(),
     body("available").optional().isBoolean(),
     body("hidden").optional().isBoolean(),
     body("featured").optional().isBoolean(),
-    body("avatar").optional().isString(),
+    body("avatar").optional({ values: "falsy" }).isString(),
     body("gallery").optional().isArray({ max: 40 }),
     body("gallery.*").optional().isString(),
     validateReq,
@@ -160,6 +160,66 @@ adminRouter.post(
 );
 
 adminRouter.get(
+  "/bookings",
+  query("take").optional(),
+  query("status").optional().isString(),
+  validateReq,
+  asyncHandler(async (req, res) => {
+    const takeRaw = clampTake(req.query.take, 200);
+    const status = typeof req.query.status === "string" ? req.query.status : undefined;
+    res.json(await adminSvc.listBookings(takeRaw, status));
+  })
+);
+
+adminRouter.patch(
+  "/bookings/:id/status",
+  [
+    param("id").isString(),
+    body("status").isIn(["PENDING", "ACCEPTED", "REJECTED", "CANCELLED", "COMPLETED"]),
+    body("note").optional().isString(),
+    validateReq,
+  ],
+  asyncHandler(async (req, res) => {
+    const { bookings } = await import("../../services/booking.service.js");
+    const updated = await bookings.setStatus(
+      req.auth!.userId,
+      req.params.id,
+      req.body.status,
+      typeof req.body.note === "string" ? req.body.note : undefined
+    );
+    res.json(updated);
+  })
+);
+
+adminRouter.get(
+  "/vip-subscriptions",
+  query("take").optional(),
+  validateReq,
+  asyncHandler(async (req, res) => {
+    const takeRaw = clampTake(req.query.take, 200);
+    res.json(await adminSvc.listVipSubscriptions(takeRaw));
+  })
+);
+
+adminRouter.patch(
+  "/vip-subscriptions/:id",
+  [
+    param("id").isString(),
+    body("active").optional().isBoolean(),
+    body("planName").optional().isString().isLength({ min: 1, max: 80 }),
+    validateReq,
+  ],
+  asyncHandler(async (req, res) => {
+    res.json(
+      await adminSvc.updateVipSubscription(req.params.id, {
+        active: typeof req.body.active === "boolean" ? req.body.active : undefined,
+        planName: typeof req.body.planName === "string" ? req.body.planName : undefined,
+      })
+    );
+  })
+);
+
+adminRouter.get(
   "/reports",
   query("take").optional(),
   query("status").optional().isString(),
@@ -168,7 +228,7 @@ adminRouter.get(
     const takeRaw = clampTake(req.query.take, 100);
     const status = typeof req.query.status === "string" ? req.query.status : undefined;
     const rows = await adminSvc.listReports(takeRaw, status);
-    res.json(rows);
+    res.json({ items: rows });
   })
 );
 

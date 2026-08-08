@@ -10,33 +10,43 @@ import ProfileCard from '../components/common/ProfileCard';
 import { fetchPublicProfile } from '../api/publicApi';
 import { mapProfile } from '../utils/mapProfile';
 import { useProfiles } from '../hooks/useProfiles';
+import { whatsappContactUrl } from '../config/site';
+import { isFavorite, toggleFavorite } from '../utils/favorites';
 
 const ProfileDetail = () => {
   const { id } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [fav, setFav] = useState(false);
   const { profiles: similar } = useProfiles({ city: 'Batumi', take: 8 });
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError('');
-    fetchPublicProfile(id)
-      .then((data) => {
-        if (!cancelled) setProfile(mapProfile(data));
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setProfile(null);
-          setError(err?.response?.data?.error || err?.message || 'პროფილი ვერ მოიძებნა');
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+    const timer = setTimeout(() => {
+      if (cancelled) return;
+      setLoading(true);
+      setError('');
+      fetchPublicProfile(id)
+        .then((data) => {
+          if (cancelled) return;
+          const mapped = mapProfile(data);
+          setProfile(mapped);
+          setFav(isFavorite(mapped?.id));
+        })
+        .catch((err) => {
+          if (!cancelled) {
+            setProfile(null);
+            setError(err?.response?.data?.error || err?.message || 'პროფილი ვერ მოიძებნა');
+          }
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }, 0);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
   }, [id]);
 
@@ -87,16 +97,9 @@ const ProfileDetail = () => {
 
             <div className="glass-dark p-8 rounded-3xl border-white/5 mb-8">
               <h2 className="text-2xl mb-4">შესახებ — <span className="text-luxury-gold">{profile.name}</span></h2>
-              {profile.aboutHtml ? (
-                <div
-                  className="text-white/60 leading-relaxed text-lg mb-8 prose prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: profile.aboutHtml }}
-                />
-              ) : (
-                <p className="text-white/60 leading-relaxed text-lg mb-8">
-                  {profile.about || 'ბიოგრაფია ჯერ არ არის დამატებული.'}
-                </p>
-              )}
+              <p className="text-white/60 leading-relaxed text-lg mb-8 whitespace-pre-wrap">
+                {profile.about || 'ბიოგრაფია ჯერ არ არის დამატებული.'}
+              </p>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                 {[
@@ -191,24 +194,63 @@ const ProfileDetail = () => {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                  <Link to="/messages" className="w-full">
+                  <a
+                    href={whatsappContactUrl({
+                      profileName: profile.name,
+                      slug: profile.slug || profile.id,
+                      intent: 'booking',
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full"
+                  >
                     <Button className="w-full py-4 text-lg flex items-center justify-center gap-2">
                       <Calendar size={20} /> ჯავშნის მოთხოვნა
                     </Button>
-                  </Link>
-                  <Link to="/messages" className="w-full">
+                  </a>
+                  <a
+                    href={whatsappContactUrl({
+                      profileName: profile.name,
+                      slug: profile.slug || profile.id,
+                      intent: 'message',
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full"
+                  >
                     <Button variant="outline" className="w-full py-4 flex items-center justify-center gap-2">
-                      <MessageSquare size={20} /> შეტყობინება
+                      <MessageSquare size={20} /> WhatsApp
                     </Button>
-                  </Link>
+                  </a>
                 </div>
 
                 <div className="mt-8 flex items-center justify-center gap-8 border-t border-white/5 pt-8">
-                  <button type="button" className="flex flex-col items-center gap-2 text-white/40 hover:text-luxury-gold transition-colors">
-                    <Heart size={20} />
+                  <button
+                    type="button"
+                    onClick={() => setFav(toggleFavorite(profile))}
+                    className={`flex flex-col items-center gap-2 transition-colors ${
+                      fav ? 'text-red-400' : 'text-white/40 hover:text-luxury-gold'
+                    }`}
+                  >
+                    <Heart size={20} fill={fav ? 'currentColor' : 'none'} />
                     <span className="text-[10px] uppercase">რჩეული</span>
                   </button>
-                  <button type="button" className="flex flex-col items-center gap-2 text-white/40 hover:text-luxury-gold transition-colors">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const url = `${window.location.origin}/profile/${profile.slug || profile.id}`;
+                      try {
+                        if (navigator.share) {
+                          await navigator.share({ title: profile.name, url });
+                        } else {
+                          await navigator.clipboard.writeText(url);
+                        }
+                      } catch {
+                        /* user cancelled share */
+                      }
+                    }}
+                    className="flex flex-col items-center gap-2 text-white/40 hover:text-luxury-gold transition-colors"
+                  >
                     <Share2 size={20} />
                     <span className="text-[10px] uppercase">გაზიარება</span>
                   </button>

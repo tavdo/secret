@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search } from 'lucide-react';
 import ProfileCard from '../components/common/ProfileCard';
 import { useProfiles } from '../hooks/useProfiles';
 
@@ -9,7 +9,7 @@ const Explore = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { profiles, loading, error } = useProfiles({ city: 'Batumi', sort: 'trending', take: 60 });
 
-  const categories = ['ყველა', 'ხელმისაწვდომი', 'მხოლოდ VIP', 'ვერიფიცირებული'];
+  const categories = ['ყველა', 'ხელმისაწვდომი', 'მხოლოდ VIP', 'რჩეული'];
 
   const filteredProfiles = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -20,7 +20,7 @@ const Explore = () => {
         activeCategory === 'ყველა' ||
         (activeCategory === 'მხოლოდ VIP' && profile.is_vip) ||
         (activeCategory === 'ხელმისაწვდომი' && profile.is_online) ||
-        (activeCategory === 'ვერიფიცირებული' && profile.is_vip);
+        (activeCategory === 'რჩეული' && profile.featured);
       return matchesSearch && matchesCategory;
     });
   }, [profiles, searchQuery, activeCategory]);
@@ -66,13 +66,6 @@ const Explore = () => {
             ))}
           </div>
 
-          <button
-            type="button"
-            className="flex items-center gap-2 bg-white/5 border border-white/10 px-6 py-3 rounded-xl text-white/60 hover:text-white transition-all"
-          >
-            <SlidersHorizontal size={20} />
-            <span>ფილტრები</span>
-          </button>
         </div>
 
         {loading && <p className="text-center text-white/40 py-16">პროფილები იტვირთება…</p>}

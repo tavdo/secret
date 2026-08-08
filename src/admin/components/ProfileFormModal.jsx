@@ -164,13 +164,14 @@ function ProfileFormBody({ editing, onClose }) {
                     onChange={(e) => set({ email: e.target.value })}
                   />
                 </Field>
-                <Field label="დროებითი პაროლი (არასავალდებულო)">
+                <Field label="დროებითი პაროლი (არასავალდებულო, მინ. 10)">
                   <input
                     type="text"
                     className={inputCls}
                     placeholder="ცარიელზე ავტომატურად შეიქმნება"
                     value={form.password}
                     onChange={(e) => set({ password: e.target.value })}
+                    minLength={form.password ? 10 : undefined}
                   />
                 </Field>
               </>
@@ -266,7 +267,7 @@ function ProfileFormBody({ editing, onClose }) {
           disabled={busy}
           className="rounded-xl border border-white/12 px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-zinc-400 hover:text-white disabled:opacity-50"
         >
-          Cancel
+          გაუქმება
         </motion.button>
         <motion.button
           type="button"
@@ -301,7 +302,7 @@ function Toggle({ label, checked, onChange }) {
       }`}
     >
       {label}
-      <span className="float-right">{checked ? 'ON' : 'OFF'}</span>
+      <span className="float-right">{checked ? 'კი' : 'არა'}</span>
     </button>
   );
 }

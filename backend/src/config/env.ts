@@ -15,20 +15,26 @@ const databaseUrlFallback = isDev
   ? "postgresql://postgres:postgres@localhost:5432/marketplace?schema=public"
   : "";
 
+const databaseUrl =
+  process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== ""
+    ? process.env.DATABASE_URL
+    : databaseUrlFallback;
+
+if (!isDev && (!databaseUrl || /localhost|127\.0\.0\.1/.test(databaseUrl))) {
+  throw new Error("DATABASE_URL must be a remote Postgres URL in production");
+}
+
 export const env = {
   NODE_ENV: process.env.NODE_ENV ?? "development",
   PORT: Number(process.env.PORT ?? 4000),
-  DATABASE_URL:
-    process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== ""
-      ? process.env.DATABASE_URL
-      : databaseUrlFallback,
+  DATABASE_URL: databaseUrl,
   JWT_ISSUER: process.env.JWT_ISSUER ?? "marketplace-api",
   JWT_SECRET: isDev
     ? get("JWT_SECRET", "dev-access-secret-change-me-in-.env")
-    : get("JWT_SECRET", "CHANGE_ME_SET_JWT_SECRET_IN_VERCEL"),
+    : get("JWT_SECRET"),
   JWT_REFRESH_SECRET: isDev
     ? get("JWT_REFRESH_SECRET", "dev-refresh-secret-change-me-in-.env")
-    : get("JWT_REFRESH_SECRET", "CHANGE_ME_SET_JWT_REFRESH_SECRET_IN_VERCEL"),
+    : get("JWT_REFRESH_SECRET"),
   JWT_ACCESS_TTL_SECONDS:
     typeof process.env.JWT_ACCESS_TTL_SECONDS === "string"
       ? Number(process.env.JWT_ACCESS_TTL_SECONDS)

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   bootstrapAdmin,
   clearAdminSession,
@@ -11,6 +11,12 @@ const AdminAuthContext = createContext(null);
 /* eslint-disable react-refresh/only-export-components */
 export function AdminAuthProvider({ children }) {
   const [session, setSession] = useState(() => getStoredAdminSession());
+
+  useEffect(() => {
+    const onCleared = () => setSession(null);
+    window.addEventListener('admin:session-cleared', onCleared);
+    return () => window.removeEventListener('admin:session-cleared', onCleared);
+  }, []);
 
   const login = useCallback(async (email, password) => {
     const data = await loginAdmin(email, password);

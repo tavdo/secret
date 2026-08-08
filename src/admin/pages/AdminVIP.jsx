@@ -50,7 +50,7 @@ export function AdminVIP() {
       <div>
         <h1 className="text-4xl font-semibold text-white tracking-tight">VIP command</h1>
         <p className="text-sm text-zinc-500 mt-2">
-          Tier topology, luminous subscriptions, storefront badge toggles — CRUD persists in session sandbox.
+          Subscriptions load from the API; tier catalog (names/prices) is local for MRR estimates. Badge toggles sync to profiles.
         </p>
       </div>
 
@@ -259,7 +259,17 @@ export function AdminVIP() {
                       <select
                         className="rounded-lg border border-white/10 bg-black/40 px-2 py-1 text-[11px]"
                         value={vipTiers.some((x) => x.name === u.plan) ? u.plan : vipTiers[0]?.name}
-                        onChange={(e) => assignSubscriptionPlan(u.id, e.target.value)}
+                        onChange={async (e) => {
+                          try {
+                            await assignSubscriptionPlan(u.id, e.target.value);
+                            toast({ title: `Plan → ${e.target.value}`, variant: "success" });
+                          } catch (err) {
+                            toast({
+                              title: err?.response?.data?.error || err?.message || "Plan update failed",
+                              variant: "danger",
+                            });
+                          }
+                        }}
                       >
                         {vipTiers.map((t) => (
                           <option key={t.id} value={t.name}>
@@ -270,7 +280,23 @@ export function AdminVIP() {
                       <motion.button
                         type="button"
                         whileHover={{ scale: 1.02 }}
-                        onClick={() => toggleVipSubStatus(u.id, u.status === "active" ? "paused" : "active")}
+                        onClick={async () => {
+                          try {
+                            await toggleVipSubStatus(
+                              u.id,
+                              u.status === "active" ? "paused" : "active"
+                            );
+                            toast({
+                              title: u.status === "active" ? "Paused" : "Resumed",
+                              variant: "success",
+                            });
+                          } catch (err) {
+                            toast({
+                              title: err?.response?.data?.error || err?.message || "Update failed",
+                              variant: "danger",
+                            });
+                          }
+                        }}
                         className="rounded-lg border border-amber-500/35 px-2 py-1 text-[11px] uppercase tracking-[0.15em]"
                       >
                         {u.status === "active" ? "Pause" : "Resume"}
@@ -286,7 +312,7 @@ export function AdminVIP() {
       </GlassPanel>
 
       <p className="text-[11px] text-center text-zinc-600 uppercase tracking-[0.25em] flex items-center justify-center gap-2">
-        <Sparkles className="h-3.5 w-3.5 text-amber-400" /> Sovereign tiers sync to Profiles when API attaches
+        <Sparkles className="h-3.5 w-3.5 text-amber-400" /> VIP subscriptions sync via /admin/vip-subscriptions
       </p>
     </div>
   );

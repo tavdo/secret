@@ -1,12 +1,22 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, MapPin, ShieldCheck, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { isFavorite, toggleFavorite } from '../../utils/favorites';
 
 const ProfileCard = ({ profile }) => {
   const href = `/profile/${profile.slug || profile.id}`;
   const image = profile.images?.[0];
   const tags = Array.isArray(profile.tags) ? profile.tags : [];
   const ageLabel = profile.age ? `, ${profile.age}` : '';
+  const [fav, setFav] = useState(() => isFavorite(profile.id));
+
+  useEffect(() => {
+    const sync = () => setFav(isFavorite(profile.id));
+    sync();
+    window.addEventListener('favorites:changed', sync);
+    return () => window.removeEventListener('favorites:changed', sync);
+  }, [profile.id]);
 
   return (
     <Link to={href}>
@@ -40,11 +50,17 @@ const ProfileCard = ({ profile }) => {
 
         <button
           type="button"
-          className="absolute top-4 right-4 p-2 glass-dark rounded-full text-white/50 hover:text-red-500 transition-colors"
-          onClick={(e) => e.preventDefault()}
+          className={`absolute top-4 right-4 p-2 glass-dark rounded-full transition-colors ${
+            fav ? 'text-red-500' : 'text-white/50 hover:text-red-500'
+          }`}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setFav(toggleFavorite(profile));
+          }}
           aria-label="რჩეულებში დამატება"
         >
-          <Heart size={18} />
+          <Heart size={18} fill={fav ? 'currentColor' : 'none'} />
         </button>
 
         <div className="absolute bottom-0 left-0 w-full p-6">

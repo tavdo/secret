@@ -5,7 +5,7 @@ export function DeleteConfirmModal({
   onClose,
   title,
   message,
-  confirmLabel = 'Delete',
+  confirmLabel = 'წაშლა',
   onConfirm,
   danger = true,
 }) {
@@ -17,7 +17,7 @@ export function DeleteConfirmModal({
           className="rounded-xl border border-white/15 px-4 py-2 text-xs uppercase tracking-[0.2em] text-zinc-300 hover:bg-white/[0.04]"
           onClick={onClose}
         >
-          Cancel
+          გაუქმება
         </button>
         <button
           type="button"

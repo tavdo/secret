@@ -73,6 +73,9 @@ adminApi.interceptors.response.use(
   (err) => {
     if (err?.response?.status === 401) {
       clearAdminSession();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('admin:session-cleared'));
+      }
     }
     return Promise.reject(err);
   }
@@ -116,5 +119,55 @@ export async function persistProfileRemote(id, patch) {
 
 export async function deleteProfileRemote(id) {
   const { data } = await adminApi.delete(`/profiles/${id}`);
+  return data;
+}
+
+export async function fetchUsersRemote(params = {}) {
+  const { data } = await adminApi.get('/users', { params: { take: 100, ...params } });
+  return data;
+}
+
+export async function setUserStatusRemote(id, status) {
+  const { data } = await adminApi.patch(`/users/${id}/status`, { status });
+  return data;
+}
+
+export async function fetchBookingsRemote(params = {}) {
+  const { data } = await adminApi.get('/bookings', { params: { take: 200, ...params } });
+  return data;
+}
+
+export async function setBookingStatusRemote(id, status) {
+  const { data } = await adminApi.patch(`/bookings/${id}/status`, { status });
+  return data;
+}
+
+export async function fetchVipSubscriptionsRemote(params = {}) {
+  const { data } = await adminApi.get('/vip-subscriptions', { params: { take: 200, ...params } });
+  return data;
+}
+
+export async function updateVipSubscriptionRemote(id, patch) {
+  const { data } = await adminApi.patch(`/vip-subscriptions/${id}`, patch);
+  return data;
+}
+
+export async function createVipSubscriptionRemote(profileId, body) {
+  const { data } = await adminApi.post(`/profiles/${profileId}/vip`, body);
+  return data;
+}
+
+export async function fetchReportsRemote(params = {}) {
+  const { data } = await adminApi.get('/reports', { params: { take: 100, ...params } });
+  return data;
+}
+
+export async function updateReportRemote(id, patch) {
+  const { data } = await adminApi.patch(`/reports/${id}`, patch);
+  return data;
+}
+
+export async function fetchAnalyticsRemote() {
+  const { data } = await adminApi.get('/analytics');
   return data;
 }
