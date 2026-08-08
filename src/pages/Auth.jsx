@@ -34,26 +34,26 @@ const Auth = () => {
       return;
     }
     if (!phone.trim() || phone.replace(/\D/g, '').length < 9) {
-      setError('ჩაწერეთ სწორი ტელეფონი.');
+      setError('ჩაწერეთ სწორი ტელეფონი (მინ. 9 ციფრი).');
       return;
     }
     if (!services.trim()) {
       setError('ჩაწერეთ სერვისები.');
       return;
     }
-    window.open(
-      whatsappRegistrationUrl({
-        name: name.trim(),
-        phone: phone.trim(),
-        email: email.trim(),
-        age: age.trim(),
-        services: services.trim(),
-        bio: bio.trim(),
-        rate: rate.trim(),
-      }),
-      '_blank',
-      'noopener,noreferrer'
-    );
+
+    const url = whatsappRegistrationUrl({
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
+      age: age.trim(),
+      services: services.trim(),
+      bio: bio.trim(),
+      rate: rate.trim(),
+    });
+
+    // Same-tab is reliable on mobile; window.open with noopener is often blocked.
+    window.location.assign(url);
   };
 
   return (
@@ -188,18 +188,24 @@ const Auth = () => {
             </div>
 
             {error ? (
-              <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+              <p
+                role="alert"
+                className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200"
+              >
                 {error}
               </p>
             ) : null}
 
-            <Button type="submit" className="w-full py-4 text-lg flex items-center justify-center gap-2">
+            <Button
+              type="submit"
+              className="w-full py-4 text-lg flex items-center justify-center gap-2"
+            >
               <MessageCircle size={20} />
               გაგრძელება WhatsApp-ზე
             </Button>
 
             <p className="text-center text-[11px] text-white/35 leading-relaxed">
-              კლიენტები დაგირეგისტრირების გარეშე აირჩევენ ქალს და ურედ ტელეფონზე. {REGISTRATION_FEE_GEL}₾.
+              კლიენტები რეგისტრაციის გარეშე აირჩევენ ქალს და დარეკავენ. საფასური {REGISTRATION_FEE_GEL}₾.
             </p>
           </form>
 
