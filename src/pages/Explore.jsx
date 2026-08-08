@@ -5,11 +5,11 @@ import ProfileCard from '../components/common/ProfileCard';
 import { useProfiles } from '../hooks/useProfiles';
 
 const Explore = () => {
-  const [activeCategory, setActiveCategory] = useState('All');
+  const [activeCategory, setActiveCategory] = useState('ყველა');
   const [searchQuery, setSearchQuery] = useState('');
   const { profiles, loading, error } = useProfiles({ city: 'Batumi', sort: 'trending', take: 60 });
 
-  const categories = ['All', 'Available', 'VIP Only', 'Verified'];
+  const categories = ['ყველა', 'ხელმისაწვდომი', 'მხოლოდ VIP', 'ვერიფიცირებული'];
 
   const filteredProfiles = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -17,10 +17,10 @@ const Explore = () => {
       const hay = `${profile.name} ${profile.location} ${profile.tags.join(' ')} ${profile.servicesText}`.toLowerCase();
       const matchesSearch = !q || hay.includes(q);
       const matchesCategory =
-        activeCategory === 'All' ||
-        (activeCategory === 'VIP Only' && profile.is_vip) ||
-        (activeCategory === 'Available' && profile.is_online) ||
-        (activeCategory === 'Verified' && profile.is_vip);
+        activeCategory === 'ყველა' ||
+        (activeCategory === 'მხოლოდ VIP' && profile.is_vip) ||
+        (activeCategory === 'ხელმისაწვდომი' && profile.is_online) ||
+        (activeCategory === 'ვერიფიცირებული' && profile.is_vip);
       return matchesSearch && matchesCategory;
     });
   }, [profiles, searchQuery, activeCategory]);
@@ -30,10 +30,10 @@ const Explore = () => {
       <div className="container mx-auto">
         <header className="mb-12">
           <h1 className="text-4xl md:text-5xl mb-4">
-            Discover <span className="text-luxury-gold">Companions</span>
+            აღმოაჩინე <span className="text-luxury-gold">თანმხლებები</span>
           </h1>
           <p className="text-white/40">
-            Women in Batumi offering services to clients — browse rates, availability, and what they offer.
+            ბათუმში ქალები, რომლებიც კლიენტებს სერვისს სთავაზობენ — ტარიფები, ხელმისაწვდომობა და შეთავაზებები.
           </p>
         </header>
 
@@ -42,7 +42,7 @@ const Explore = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={20} />
             <input
               type="text"
-              placeholder="Search by name, services, or location..."
+              placeholder="ძებნა სახელით, სერვისით ან ლოკაციით..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 focus:outline-none focus:border-luxury-gold/50 transition-all"
@@ -71,11 +71,11 @@ const Explore = () => {
             className="flex items-center gap-2 bg-white/5 border border-white/10 px-6 py-3 rounded-xl text-white/60 hover:text-white transition-all"
           >
             <SlidersHorizontal size={20} />
-            <span>Filters</span>
+            <span>ფილტრები</span>
           </button>
         </div>
 
-        {loading && <p className="text-center text-white/40 py-16">Loading profiles…</p>}
+        {loading && <p className="text-center text-white/40 py-16">პროფილები იტვირთება…</p>}
         {error && !loading && (
           <p className="text-center text-red-300/80 py-8">{error}</p>
         )}
@@ -104,16 +104,16 @@ const Explore = () => {
             <div className="text-white/20 mb-4 flex justify-center">
               <Search size={64} strokeWidth={1} />
             </div>
-            <h3 className="text-xl text-white/60">No profiles found matching your criteria.</h3>
+            <h3 className="text-xl text-white/60">თქვენს კრიტერიუმებს პროფილი არ ემთხვევა.</h3>
             <button
               type="button"
               onClick={() => {
                 setSearchQuery('');
-                setActiveCategory('All');
+                setActiveCategory('ყველა');
               }}
               className="mt-4 text-luxury-gold hover:underline"
             >
-              Clear all filters
+              ფილტრების გასუფთავება
             </button>
           </div>
         )}

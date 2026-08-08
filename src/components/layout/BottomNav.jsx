@@ -6,11 +6,11 @@ const BottomNav = () => {
   const location = useLocation();
 
   const items = [
-    { icon: Home, path: '/', label: 'Home' },
-    { icon: Search, path: '/explore', label: 'Explore' },
-    { icon: MessageSquare, path: '/messages', label: 'Chats' },
-    { icon: Heart, path: '/favorites', label: 'Liked' },
-    { icon: User, path: '/profile', label: 'Me' },
+    { icon: Home, path: '/', label: 'მთავარი' },
+    { icon: Search, path: '/explore', label: 'ძებნა' },
+    { icon: MessageSquare, path: '/messages', label: 'ჩატი' },
+    { icon: Heart, path: '/favorites', label: 'რჩეული' },
+    { icon: User, path: '/auth', label: 'პროფილი' },
   ];
 
   return (
@@ -21,8 +21,8 @@ const BottomNav = () => {
           const Icon = item.icon;
 
           return (
-            <Link 
-              key={item.label} 
+            <Link
+              key={item.label}
               to={item.path}
               className="relative flex flex-col items-center gap-1 min-w-[64px]"
             >
@@ -36,7 +36,7 @@ const BottomNav = () => {
                 {item.label}
               </span>
               {isActive && (
-                <motion.div 
+                <motion.div
                   layoutId="bottomNavTab"
                   className="absolute -top-3 w-8 h-1 bg-luxury-gold rounded-full shadow-[0_0_10px_rgba(212,175,55,0.8)]"
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}

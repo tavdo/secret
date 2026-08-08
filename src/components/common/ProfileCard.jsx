@@ -27,13 +27,13 @@ const ProfileCard = ({ profile }) => {
           {profile.is_vip && (
             <div className="px-2 py-1 glass-dark text-[10px] font-bold text-luxury-gold flex items-center gap-1 rounded-full uppercase tracking-widest border-luxury-gold/30">
               <ShieldCheck size={12} />
-              VIP Elite
+              VIP
             </div>
           )}
           {profile.is_online && (
             <div className="flex items-center gap-1.5 px-2 py-1 bg-green-500/20 backdrop-blur-md rounded-full border border-green-500/30">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-[10px] font-bold text-green-400 uppercase tracking-widest">Available</span>
+              <span className="text-[10px] font-bold text-green-400 uppercase tracking-widest">ხელმისაწვდომი</span>
             </div>
           )}
         </div>
@@ -42,6 +42,7 @@ const ProfileCard = ({ profile }) => {
           type="button"
           className="absolute top-4 right-4 p-2 glass-dark rounded-full text-white/50 hover:text-red-500 transition-colors"
           onClick={(e) => e.preventDefault()}
+          aria-label="რჩეულებში დამატება"
         >
           <Heart size={18} />
         </button>
@@ -73,7 +74,7 @@ const ProfileCard = ({ profile }) => {
 
           <div className="mt-4 flex items-center justify-between">
             <span className="text-luxury-gold font-bold">{profile.price}</span>
-            <span className="text-[10px] text-white/40 uppercase tracking-widest">View Profile</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest">პროფილის ნახვა</span>
           </div>
         </div>
       </motion.div>

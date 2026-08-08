@@ -12,9 +12,9 @@ export function stripHtml(html) {
 
 function formatRate(min, max, currency = 'USD') {
   const amount = min ?? max;
-  if (amount == null) return 'On request';
+  if (amount == null) return 'შეთანხმებით';
   const symbol = currency === 'GEL' || currency === '₾' ? '₾' : '$';
-  return `${symbol}${amount}/hr`;
+  return `${symbol}${amount}/სთ`;
 }
 
 function servicesToTags(servicesText) {
@@ -47,14 +47,14 @@ export function mapProfile(raw) {
   return {
     id: raw.id,
     slug: raw.slug,
-    name: raw.displayName || 'Companion',
+    name: raw.displayName || 'თანმხლები',
     age: raw.age ?? null,
-    location: raw.city || 'Batumi',
+    location: raw.city === 'Batumi' ? 'ბათუმი' : (raw.city || 'ბათუმი'),
     images: uniqueImages,
     about: stripHtml(raw.bio),
     aboutHtml: raw.bio || '',
     servicesText,
-    tags: tags.length ? tags : categories.length ? categories : ['Companion'],
+    tags: tags.length ? tags : categories.length ? categories : ['თანმხლები'],
     rating: Number(raw.avgRating || 0).toFixed(1),
     reviews_count: raw.reviewCount ?? raw.counts?.reviews ?? 0,
     price: formatRate(raw.priceMin, raw.priceMax, raw.currency),

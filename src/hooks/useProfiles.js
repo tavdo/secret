@@ -28,7 +28,7 @@ export function useProfiles(options = {}) {
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(err?.response?.data?.error || err?.message || 'Failed to load profiles');
+        setError(err?.response?.data?.error || err?.message || 'პროფილების ჩატვირთვა ვერ მოხერხდა');
         setProfiles([]);
       })
       .finally(() => {

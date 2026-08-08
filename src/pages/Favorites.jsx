@@ -11,12 +11,12 @@ const Favorites = () => {
           <div>
             <div className="flex items-center gap-2 text-luxury-gold mb-2">
               <Heart size={20} fill="currentColor" />
-              <span className="text-xs font-bold uppercase tracking-[0.3em]">Your Collection</span>
+              <span className="text-xs font-bold uppercase tracking-[0.3em]">თქვენი კოლექცია</span>
             </div>
-            <h1 className="text-4xl md:text-5xl">Saved <span className="text-luxury-gold">Profiles</span></h1>
+            <h1 className="text-4xl md:text-5xl">შენახული <span className="text-luxury-gold">პროფილები</span></h1>
           </div>
           <p className="text-white/40 max-w-md md:text-right">
-            Favorites will appear here once you save companions from Explore.
+            რჩეულები აქ გამოჩნდება, როცა ძებნიდან შეინახავთ თანმხლებებს.
           </p>
         </header>
 
@@ -28,12 +28,12 @@ const Favorites = () => {
           <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
             <Heart size={40} className="text-white/20" />
           </div>
-          <h3 className="text-2xl mb-4">No favorites yet</h3>
+          <h3 className="text-2xl mb-4">რჩეულები ჯერ ცარიელია</h3>
           <p className="text-white/40 mb-8 max-w-sm mx-auto">
-            Browse women offering services and save the ones you like.
+            დაათვალიერეთ ქალები, რომლებიც სერვისს სთავაზობენ და შეინახეთ სასურველები.
           </p>
           <Link to="/explore">
-            <Button>Explore Profiles</Button>
+            <Button>პროფილების ნახვა</Button>
           </Link>
         </motion.div>
       </div>

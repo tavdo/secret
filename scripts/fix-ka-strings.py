@@ -1,4 +1,11 @@
-import { useState } from 'react';
+# -*- coding: utf-8 -*-
+from pathlib import Path
+import re
+
+root = Path(__file__).resolve().parents[1]
+
+# Rewrite Messaging cleanly
+messaging = r'''import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Search, MoreVertical, Send, Image as ImageIcon,
@@ -29,6 +36,8 @@ const Messaging = () => {
           </div>
 
           <div className="flex-grow overflow-y-auto px-2 no-scrollbar">
+            {MOCK_CHATS.length === 0 ? (
+              <p className="px-4 py-8 text-sm text-white/40 text-center">საუ�">
             {MOCK_CHATS.length === 0 ? (
               <p className="px-4 py-8 text-sm text-white/40 text-center">საუბრები ჯერ არ არის.</p>
             ) : null}
@@ -148,10 +157,51 @@ const Message = ({ bubble, time, isOwn }) => (
         {bubble}
       </div>
       <span className="text-[10px] text-white/20 px-1">
-        {time} {isOwn ? "· ნანახია" : ''}
+        {time} {isOwn ? '· ნანახია' : ''}
       </span>
     </div>
   </motion.div>
 );
 
 export default Messaging;
+'''
+(root / 'src/pages/Messaging.jsx').write_text(messaging, encoding='utf-8')
+
+# Fix AdminLogin error message block
+login_path = root / 'src/admin/pages/AdminLogin.jsx'
+login = login_path.read_text(encoding='utf-8')
+login = re.sub(
+    r"err\?\.code === 'NOT_ADMIN'[\s\S]*?setError\(msg\);",
+    """err?.code === 'NOT_ADMIN'
+          ? 'ეს ანგარიში ადმინი არ არის.'
+          : err?.response?.data?.error || err?.message || 'შესვლა ვერ მოხერხდა';
+      setError(msg);""",
+    login,
+    count=1,
+)
+login = re.sub(
+    r"<p className=\"text-xs text-zinc-500 leading-relaxed\">[\s\S]*?</p>\s*\) : null\}",
+    """<p className="text-xs text-zinc-500 leading-relaxed">
+              ქმნის პირველ ადმინს, თუ არცერთი არ არსებობს. გამოიყენეთ ერთხელ, შემდეგ შედით ჩვეულებრივად.
+            </p>
+          ) : null}""",
+    login,
+    count=1,
+)
+login_path.write_text(login, encoding='utf-8')
+
+# Strip replacement chars from key files
+for rel in [
+    'src/pages/Home.jsx',
+    'src/pages/Auth.jsx',
+    'src/pages/Messaging.jsx',
+    'src/admin/pages/AdminLogin.jsx',
+    'src/admin/components/ProfileFormModal.jsx',
+]:
+    p = root / rel
+    t = p.read_text(encoding='utf-8')
+    if '\ufffd' in t:
+        print('HAS REPLACEMENT:', rel)
+    else:
+        print('clean:', rel)
+print('done')

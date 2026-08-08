@@ -18,19 +18,19 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Explore', path: '/explore' },
-    { name: 'VIP Only', path: '/vip' },
+    { name: 'ძებნა', path: '/explore' },
+    { name: 'VIP', path: '/vip' },
   ];
 
   return (
-    <nav 
+    <nav
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
         isScrolled ? 'py-4 glass-dark' : 'py-6 bg-transparent'
       }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <motion.div 
+          <motion.div
             initial={{ rotate: -10 }}
             animate={{ rotate: 10 }}
             transition={{ repeat: Infinity, duration: 4, repeatType: 'reverse' }}
@@ -43,11 +43,10 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
+            <Link
+              key={link.name}
               to={link.path}
               className={`text-sm font-medium transition-colors hover:text-luxury-gold ${
                 location.pathname === link.path ? 'text-luxury-gold' : 'text-white/80'
@@ -59,27 +58,27 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-4">
-          <button className="p-2 text-white/70 hover:text-white transition-colors">
+          <button type="button" className="p-2 text-white/70 hover:text-white transition-colors" aria-label="ძებნა">
             <Search size={20} />
           </button>
-          <Link to="/favorites" className="p-2 text-white/70 hover:text-white transition-colors">
+          <Link to="/favorites" className="p-2 text-white/70 hover:text-white transition-colors" aria-label="რჩეულები">
             <Heart size={20} />
           </Link>
           <Link to="/auth">
-            <Button variant="outline" className="py-2 px-6">Login</Button>
+            <Button variant="outline" className="py-2 px-6">შესვლა</Button>
           </Link>
         </div>
 
-        {/* Mobile Toggle */}
-        <button 
+        <button
+          type="button"
           className="md:hidden p-2 text-white"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="მენიუ"
         >
           {mobileMenuOpen ? <X /> : <Menu />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -89,8 +88,8 @@ const Navbar = () => {
             className="absolute top-full left-0 w-full glass-dark py-8 flex flex-col items-center gap-6 md:hidden"
           >
             {navLinks.map((link) => (
-              <Link 
-                key={link.name} 
+              <Link
+                key={link.name}
                 to={link.path}
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-lg font-medium text-white/80 hover:text-luxury-gold"
@@ -99,9 +98,11 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="flex flex-col items-center gap-4 w-full px-6">
-              <Button className="w-full">Get Started</Button>
               <Link to="/auth" className="w-full" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="outline" className="w-full">Login</Button>
+                <Button className="w-full">დაწყება</Button>
+              </Link>
+              <Link to="/auth" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="outline" className="w-full">შესვლა</Button>
               </Link>
             </div>
           </motion.div>

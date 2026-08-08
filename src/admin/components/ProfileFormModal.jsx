@@ -54,8 +54,8 @@ export function ProfileFormModal({ open, onClose, editing }) {
       open={open}
       onClose={onClose}
       size="xl"
-      title={isEdit ? 'Edit profile' : 'Add profile'}
-      subtitle="Creates or updates a live provider listing in the database."
+      title={isEdit ? 'პროფილის რედაქტირება' : 'პროფილის დამატება'}
+      subtitle="ქმნის ან განაახლებს პროვაიდერის განცხადებას ბაზაში."
     >
       {open ? (
         <ProfileFormBody key={editing?.id ?? 'create'} editing={editing} onClose={onClose} />
@@ -75,11 +75,11 @@ function ProfileFormBody({ editing, onClose }) {
 
   const save = async () => {
     if (!form.displayName.trim()) {
-      toast({ title: 'Name required', variant: 'danger' });
+      toast({ title: 'სახელი სავალდებულოა', variant: 'danger' });
       return;
     }
     if (!form.city.trim()) {
-      toast({ title: 'City required', variant: 'danger' });
+      toast({ title: 'ქალაქი სავალდებულოა', variant: 'danger' });
       return;
     }
     setBusy(true);
@@ -105,18 +105,18 @@ function ProfileFormBody({ editing, onClose }) {
           if (!before.has(u))
             addMedia({ url: u, profileId: editing.id, label: `${form.displayName} carousel` });
         });
-        toast({ title: 'Profile updated', variant: 'success' });
+        toast({ title: 'პროფილი განახლდა', variant: 'success' });
       } else {
         const nid = await addProfile(form);
         (form.gallery || []).forEach((u) =>
           addMedia({ url: u, profileId: nid, label: `${form.displayName} carousel` })
         );
-        toast({ title: 'Profile created', variant: 'success' });
+        toast({ title: 'პროფილი შეიქმნა', variant: 'success' });
       }
       onClose?.();
     } catch (err) {
       toast({
-        title: err?.response?.data?.error || err?.message || 'Save failed',
+        title: err?.response?.data?.error || err?.message || 'შენახვა ვერ მოხერხდა',
         variant: 'danger',
       });
     } finally {
@@ -138,14 +138,14 @@ function ProfileFormBody({ editing, onClose }) {
       <div className="grid gap-8 lg:grid-cols-[1.1fr_minmax(0,0.95fr)]">
         <div className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Display name">
+            <Field label="სახელი">
               <input
                 className={inputCls}
                 value={form.displayName}
                 onChange={(e) => set({ displayName: e.target.value })}
               />
             </Field>
-            <Field label="Handle / slug">
+            <Field label="ჰენდლი / slug">
               <input
                 className={inputCls}
                 placeholder="@handle"
@@ -155,31 +155,31 @@ function ProfileFormBody({ editing, onClose }) {
             </Field>
             {!isEdit ? (
               <>
-                <Field label="Provider email (optional)">
+                <Field label="ელფოსტა (არასავალდებულო)">
                   <input
                     type="email"
                     className={inputCls}
-                    placeholder="auto-generated if empty"
+                    placeholder="ცარიელზე ავტომატურად შეიქმნება"
                     value={form.email}
                     onChange={(e) => set({ email: e.target.value })}
                   />
                 </Field>
-                <Field label="Temp password (optional)">
+                <Field label="დროებითი პაროლი (არასავალდებულო)">
                   <input
                     type="text"
                     className={inputCls}
-                    placeholder="auto-generated if empty"
+                    placeholder="ცარიელზე ავტომატურად შეიქმნება"
                     value={form.password}
                     onChange={(e) => set({ password: e.target.value })}
                   />
                 </Field>
               </>
             ) : (
-              <Field label="Linked email">
+              <Field label="მიბმული ელფოსტა">
                 <input className={inputCls} value={form.email} disabled />
               </Field>
             )}
-            <Field label="Age">
+            <Field label="ასაკი">
               <input
                 type="number"
                 min={18}
@@ -188,17 +188,17 @@ function ProfileFormBody({ editing, onClose }) {
                 onChange={(e) => set({ age: Number(e.target.value) || 18 })}
               />
             </Field>
-            <Field label="City">
+            <Field label="ქალაქი">
               <select
                 className={inputCls}
                 value={form.city || 'Batumi'}
                 onChange={(e) => set({ city: e.target.value })}
               >
-                <option value="Batumi">Batumi</option>
+                <option value="Batumi">ბათუმი</option>
               </select>
             </Field>
           </div>
-          <Field label="Hourly rate (USD)">
+          <Field label="საათობრივი ტარიფი (USD)">
             <input
               type="number"
               step={50}
@@ -209,28 +209,28 @@ function ProfileFormBody({ editing, onClose }) {
           </Field>
 
           <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
-            <Toggle label="VIP luminous" checked={form.vip} onChange={(v) => set({ vip: v })} />
-            <Toggle label="Available online" checked={form.available} onChange={(v) => set({ available: v })} />
-            <Toggle label="Hide listing" checked={form.hidden} onChange={(v) => set({ hidden: v })} />
-            <Toggle label="Feature homepage" checked={form.featured} onChange={(v) => set({ featured: v })} />
+            <Toggle label="VIP" checked={form.vip} onChange={(v) => set({ vip: v })} />
+            <Toggle label="ხელმისაწვდომი" checked={form.available} onChange={(v) => set({ available: v })} />
+            <Toggle label="დამალული" checked={form.hidden} onChange={(v) => set({ hidden: v })} />
+            <Toggle label="მთავარ გვერდზე" checked={form.featured} onChange={(v) => set({ featured: v })} />
           </div>
 
-          <Field label="Services offered (one per line or comma-separated)">
+          <Field label="შეთავაზებული სერვისები (თითო ხაზზე ან მძიმით)">
             <textarea
               className={`${inputCls} min-h-[110px] resize-y`}
-              placeholder="Dinner dates, travel companion, private events…"
+              placeholder="ვახშამი, მოგზაურობის თანმხლები, პირადი ღონისძიებები…"
               value={form.servicesText}
               onChange={(e) => set({ servicesText: e.target.value })}
             />
           </Field>
 
-          <Field label="Biography (rich text CMS)">
+          <Field label="ბიოგრაფია">
             <RichTextBioEditor value={form.bio} onChange={(html) => set({ bio: html })} />
           </Field>
         </div>
 
         <div className="space-y-4">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-zinc-500">Portrait & carousel</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-zinc-500">ფოტო და კარუსელი</p>
           <MediaUploader compact onUploaded={attachImage} />
           {form.avatar ? (
             <div className="rounded-xl overflow-hidden border border-white/10 max-h-52">

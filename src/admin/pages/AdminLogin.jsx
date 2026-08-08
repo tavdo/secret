@@ -31,8 +31,8 @@ export function AdminLogin() {
     } catch (err) {
       const msg =
         err?.code === 'NOT_ADMIN'
-          ? 'This account is not an admin.'
-          : err?.response?.data?.error || err?.message || 'Sign-in failed';
+          ? 'ეს ანგარიში ადმინი არ არის.'
+          : err?.response?.data?.error || err?.message || 'შესვლა ვერ მოხერხდა';
       setError(msg);
     } finally {
       setBusy(false);
@@ -51,24 +51,24 @@ export function AdminLogin() {
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-[0.3em] text-amber-500/80 font-semibold">
-              Control plane
+              კონტროლის პანელი
             </p>
-            <h1 className="text-2xl font-semibold tracking-tight">Admin access</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">ადმინის შესვლა</h1>
           </div>
         </div>
 
         <div className="mb-5 flex gap-2">
           <ModeTab active={mode === 'login'} onClick={() => setMode('login')}>
-            Sign in
+            შესვლა
           </ModeTab>
           <ModeTab active={mode === 'bootstrap'} onClick={() => setMode('bootstrap')}>
-            First admin
+            პირველი ადმინი
           </ModeTab>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
           {mode === 'bootstrap' ? (
-            <Field label="Display name">
+            <Field label="სახელი">
               <input
                 className={inputCls}
                 value={displayName}
@@ -77,7 +77,7 @@ export function AdminLogin() {
               />
             </Field>
           ) : null}
-          <Field label="Email">
+          <Field label="ელფოსტა">
             <input
               type="email"
               className={inputCls}
@@ -86,7 +86,7 @@ export function AdminLogin() {
               required
             />
           </Field>
-          <Field label="Password">
+          <Field label="პაროლი">
             <input
               type="password"
               className={inputCls}
@@ -99,7 +99,7 @@ export function AdminLogin() {
 
           {mode === 'bootstrap' ? (
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Creates the first ADMIN when none exist. Use this once, then sign in normally.
+              ქმნის პირველ ადმინს, თუ არცერთი არ არსებობს. გამოიყენეთ ერთხელ, შემდეგ შედით ჩვეულებრივად.
             </p>
           ) : null}
 
@@ -115,7 +115,7 @@ export function AdminLogin() {
             whileTap={{ scale: 0.98 }}
             className="w-full rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-500/90 to-yellow-700/85 px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-black disabled:opacity-60"
           >
-            {busy ? 'Working…' : mode === 'bootstrap' ? 'Create admin' : 'Enter console'}
+            {busy ? 'მიმდინარეობს…' : mode === 'bootstrap' ? 'ადმინის შექმნა' : 'შესვლა'}
           </motion.button>
         </form>
       </GlassPanel>

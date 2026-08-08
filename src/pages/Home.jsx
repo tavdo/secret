@@ -36,23 +36,23 @@ const Home = () => {
             transition={{ duration: 1 }}
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-luxury-gold text-xs font-bold uppercase tracking-[0.3em] mb-6">
-              <Sparkles size={14} /> Women offering services in Batumi
+              <Sparkles size={14} /> ქალები, რომლებიც სერვისს სთავაზობენ ბათუმში
             </span>
             <h1 className="text-5xl md:text-8xl mb-8 leading-tight">
-              Elevate Your <br />
-              <span className="gold-text-gradient">Experience</span>
+              გააუმჯობესე <br />
+              <span className="gold-text-gradient">შენი გამოცდილება</span>
             </h1>
             <p className="max-w-2xl mx-auto text-lg text-white/60 mb-10 font-light leading-relaxed">
-              Browse verified women who offer companionship and personal services to clients.
-              Discretion, clarity, and real listings — managed from the admin panel.
+              იპოვე ვერიფიცირებული ქალები, რომლებიც კლიენტებს თანმხლებობასა და პირად სერვისებს სთავაზობენ.
+              დისკრეცია, სიცხადე და რეალური განცხადებები — ადმინისტრაციის მართვით.
             </p>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6">
               <Link to="/explore">
-                <Button className="px-10 py-5 text-lg">Explore Profiles</Button>
+                <Button className="px-10 py-5 text-lg">პროფილების ნახვა</Button>
               </Link>
               <Link to="/auth">
                 <Button variant="ghost" className="flex items-center gap-2 group">
-                  Register as Provider <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                  რეგისტრაცია პროვაიდერად <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
                 </Button>
               </Link>
             </div>
@@ -63,9 +63,9 @@ const Home = () => {
           <div className="container mx-auto px-6 flex justify-between items-end">
             <div className="flex gap-12">
               {[
-                { label: 'Active listings', value: loading ? '…' : String(profiles.length) },
-                { label: 'City', value: 'Batumi' },
-                { label: 'Status', value: 'Live' },
+                { label: 'აქტიური განცხადებები', value: loading ? '…' : String(profiles.length) },
+                { label: 'ქალაქი', value: 'ბათუმი' },
+                { label: 'სტატუსი', value: 'ონლაინ' },
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -85,20 +85,20 @@ const Home = () => {
       <section className="py-24 bg-luxury-dark relative">
         <div className="container mx-auto px-6 mb-12 flex items-end justify-between">
           <div>
-            <h2 className="text-4xl mb-2">Featured <span className="text-luxury-gold">Companions</span></h2>
-            <p className="text-white/40">Women currently offering services to clients in Batumi.</p>
+            <h2 className="text-4xl mb-2">რჩეული <span className="text-luxury-gold">თანმხლებები</span></h2>
+            <p className="text-white/40">ქალები, რომლებიც ამჟამად სერვისს სთავაზობენ ბათუმში.</p>
           </div>
           <Link to="/explore" className="hidden md:block">
-            <Button variant="outline">View All</Button>
+            <Button variant="outline">ყველას ნახვა</Button>
           </Link>
         </div>
 
         <div className="px-6 md:px-0">
           {loading ? (
-            <p className="text-center text-white/40 py-16">Loading profiles…</p>
+            <p className="text-center text-white/40 py-16">პროფილები იტვირთება…</p>
           ) : profiles.length === 0 ? (
             <p className="text-center text-white/40 py-16">
-              No active listings yet. Add women from the admin panel and they will appear here.
+              ჯერ აქტიური განცხადება არ არის. ადმინ-პანელიდან დაამატეთ პროფილები.
             </p>
           ) : (
             <Swiper
@@ -133,18 +133,18 @@ const Home = () => {
           {[
             {
               icon: ShieldCheck,
-              title: 'Total Discretion',
-              desc: 'Private browsing and encrypted messaging options for your privacy.',
+              title: 'სრული დისკრეცია',
+              desc: 'პრივატული დათვალიერება და დაცული კომუნიკაცია თქვენი კონფიდენციალურობისთვის.',
             },
             {
               icon: Zap,
-              title: 'Real Listings',
-              desc: 'Profiles are managed by admins — rates, services, and availability stay current.',
+              title: 'რეალური განცხადებები',
+              desc: 'პროფილებს ადმინისტრაცია მართავს — ტარიფები, სერვისები და ხელმისაწვდომობა აქტუალურია.',
             },
             {
               icon: Star,
-              title: 'Clear Services',
-              desc: 'Each companion lists the services she offers so clients know what to expect.',
+              title: 'გასაგები სერვისები',
+              desc: 'თითოეული პროფილი ჩამოთვლის შეთავაზებულ სერვისებს, რომ კლიენტმა იცოდეს რას ელის.',
             },
           ].map((item, i) => (
             <motion.div

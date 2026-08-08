@@ -32,11 +32,11 @@ const Auth = () => {
     e.preventDefault();
     setError('');
     if (!name.trim()) {
-      setError('გთხოვთ ჩაწეროთ სახელი / Please enter your name.');
+      setError('გთხოვთ ჩაწეროთ სახელი.');
       return;
     }
     if (!phone.trim() || phone.replace(/\D/g, '').length < 9) {
-      setError('გთხოვთ ჩაწეროთ სწორი ტელეფონის ნომერი / Enter a valid phone number.');
+      setError('გთხოვთ ჩაწეროთ სწორი ტელეფონის ნომერი.');
       return;
     }
     window.open(
@@ -67,12 +67,12 @@ const Auth = () => {
             </div>
           </div>
           <h1 className="text-3xl font-bold mb-2">
-            {isLogin ? 'Welcome Back' : 'Registration'}
+            {isLogin ? 'კეთილი იყოს დაბრუნება' : 'რეგისტრაცია'}
           </h1>
           <p className="text-white/40">
             {isLogin
-              ? 'Access your private account.'
-              : `Women’s listing registration for ${CITY} — then continue on WhatsApp.`}
+              ? 'შედით თქვენს პირად ანგარიშში.'
+              : `ქალების რეგისტრაცია ${CITY}-ში — შემდეგ გააგრძელეთ WhatsApp-ზე.`}
           </p>
         </div>
 
@@ -83,15 +83,15 @@ const Auth = () => {
                 <Banknote className="text-luxury-gold shrink-0 mt-0.5" size={22} />
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.25em] text-luxury-gold mb-1">
-                    Registration fee
+                    რეგისტრაციის საფასური
                   </p>
                   <p className="text-2xl font-semibold text-white">
                     {REGISTRATION_FEE_GEL}₾
                   </p>
                   <p className="text-sm text-white/55 mt-2 leading-relaxed">
-                    After you submit, you will open WhatsApp with us. We will tell you
-                    exactly where to pay the {REGISTRATION_FEE_GEL}₾ registration fee.
-                    Your profile goes live after payment is confirmed.
+                    გაგზავნის შემდეგ გაიხსნება WhatsApp. იქ გეტყვით ზუსტად,
+                    სად გადაიხადოთ {REGISTRATION_FEE_GEL}₾ რეგისტრაციის საფასური.
+                    პროფილი გადახდის დადასტურების შემდეგ გამოჩნდება.
                   </p>
                 </div>
               </div>
@@ -111,7 +111,7 @@ const Auth = () => {
                 <>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-white/60 uppercase tracking-widest px-1">
-                      Full name
+                      სახელი და გვარი
                     </label>
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
@@ -119,7 +119,7 @@ const Auth = () => {
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Your name"
+                        placeholder="თქვენი სახელი"
                         required
                         className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 focus:outline-none focus:border-luxury-gold/50 transition-all"
                       />
@@ -128,7 +128,7 @@ const Auth = () => {
 
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-white/60 uppercase tracking-widest px-1">
-                      Phone (WhatsApp)
+                      ტელეფონი (WhatsApp)
                     </label>
                     <div className="relative">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
@@ -145,7 +145,7 @@ const Auth = () => {
 
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-white/60 uppercase tracking-widest px-1">
-                      City
+                      ქალაქი
                     </label>
                     <input
                       type="text"
@@ -159,7 +159,7 @@ const Auth = () => {
 
               <div className="space-y-2">
                 <label className="text-xs font-bold text-white/60 uppercase tracking-widest px-1">
-                  Email {isLogin ? 'Address' : '(optional)'}
+                  ელფოსტა {isLogin ? '' : '(არასავალდებულო)'}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
@@ -178,10 +178,10 @@ const Auth = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center px-1">
                     <label className="text-xs font-bold text-white/60 uppercase tracking-widest">
-                      Password
+                      პაროლი
                     </label>
                     <button type="button" className="text-[10px] text-luxury-gold hover:underline">
-                      Forgot?
+                      დაგავიწყდათ?
                     </button>
                   </div>
                   <div className="relative">
@@ -212,7 +212,7 @@ const Auth = () => {
 
               {isLogin ? (
                 <Button className="w-full py-4 text-lg flex items-center justify-center gap-2">
-                  Enter The Vault
+                  შესვლა
                   <ArrowRight size={20} />
                 </Button>
               ) : (
@@ -221,14 +221,14 @@ const Auth = () => {
                   className="w-full py-4 text-lg flex items-center justify-center gap-2"
                 >
                   <MessageCircle size={20} />
-                  Continue on WhatsApp
+                  გაგრძელება WhatsApp-ზე
                 </Button>
               )}
 
               {!isLogin && (
                 <p className="text-center text-[11px] text-white/35 leading-relaxed">
-                  By continuing you agree that registration costs {REGISTRATION_FEE_GEL}₾ and
-                  payment instructions are sent only via WhatsApp.
+                  გაგრძელებით ეთანხმებით, რომ რეგისტრაცია ღირს {REGISTRATION_FEE_GEL}₾ და
+                  გადახდის ინსტრუქცია იგზავნება მხოლოდ WhatsApp-ით.
                 </p>
               )}
             </motion.form>
@@ -236,7 +236,7 @@ const Auth = () => {
 
           <div className="mt-8 text-center border-t border-white/5 pt-8">
             <p className="text-sm text-white/40">
-              {isLogin ? "Want to register as a woman?" : 'Already registered?'}{' '}
+              {isLogin ? 'გსურთ ქალის რეგისტრაცია?' : 'უკვე დარეგისტრირებული ხართ?'}{' '}
               <button
                 type="button"
                 onClick={() => {
@@ -245,7 +245,7 @@ const Auth = () => {
                 }}
                 className="text-luxury-gold font-bold hover:underline"
               >
-                {isLogin ? 'Register — 600₾' : 'Log In'}
+                {isLogin ? 'რეგისტრაცია — 600₾' : 'შესვლა'}
               </button>
             </p>
           </div>
@@ -254,10 +254,10 @@ const Auth = () => {
         <div className="mt-8 flex items-center justify-center gap-4 text-white/20">
           <div className="flex items-center gap-1.5">
             <MessageCircle size={14} />
-            <span className="text-[10px] uppercase tracking-widest font-bold">WhatsApp payment guide</span>
+            <span className="text-[10px] uppercase tracking-widest font-bold">WhatsApp გადახდა</span>
           </div>
           <div className="w-1 h-1 bg-white/10 rounded-full" />
-          <span className="text-[10px] uppercase tracking-widest font-bold">{CITY} only</span>
+          <span className="text-[10px] uppercase tracking-widest font-bold">მხოლოდ {CITY}</span>
         </div>
       </motion.div>
     </div>

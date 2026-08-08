@@ -29,7 +29,7 @@ const ProfileDetail = () => {
       .catch((err) => {
         if (!cancelled) {
           setProfile(null);
-          setError(err?.response?.data?.error || err?.message || 'Profile not found');
+          setError(err?.response?.data?.error || err?.message || 'პროფილი ვერ მოიძებნა');
         }
       })
       .finally(() => {
@@ -41,14 +41,14 @@ const ProfileDetail = () => {
   }, [id]);
 
   if (loading) {
-    return <div className="pt-28 pb-12 text-center text-white/40">Loading profile…</div>;
+    return <div className="pt-28 pb-12 text-center text-white/40">პროფილი იტვირთება…</div>;
   }
 
   if (!profile) {
     return (
       <div className="pt-28 pb-12 text-center">
-        <p className="text-white/60 mb-4">{error || 'Profile not found'}</p>
-        <Link to="/explore" className="text-luxury-gold hover:underline">Back to Explore</Link>
+        <p className="text-white/60 mb-4">{error || 'პროფილი ვერ მოიძებნა'}</p>
+        <Link to="/explore" className="text-luxury-gold hover:underline">უკან ძებნაზე</Link>
       </div>
     );
   }
@@ -66,7 +66,7 @@ const ProfileDetail = () => {
     <div className="pt-20 pb-12">
       <div className="container mx-auto px-6">
         <Link to="/explore" className="inline-flex items-center gap-2 text-white/40 hover:text-white mb-8 transition-colors">
-          <ChevronLeft size={20} /> Back to Explore
+          <ChevronLeft size={20} /> უკან ძებნაზე
         </Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -86,7 +86,7 @@ const ProfileDetail = () => {
             </div>
 
             <div className="glass-dark p-8 rounded-3xl border-white/5 mb-8">
-              <h2 className="text-2xl mb-4">About <span className="text-luxury-gold">{profile.name}</span></h2>
+              <h2 className="text-2xl mb-4">შესახებ — <span className="text-luxury-gold">{profile.name}</span></h2>
               {profile.aboutHtml ? (
                 <div
                   className="text-white/60 leading-relaxed text-lg mb-8 prose prose-invert max-w-none"
@@ -94,15 +94,15 @@ const ProfileDetail = () => {
                 />
               ) : (
                 <p className="text-white/60 leading-relaxed text-lg mb-8">
-                  {profile.about || 'No biography yet.'}
+                  {profile.about || 'ბიოგრაფია ჯერ არ არის დამატებული.'}
                 </p>
               )}
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                 {[
-                  { label: 'City', value: profile.location },
-                  { label: 'Age', value: profile.age ? String(profile.age) : '—' },
-                  { label: 'Status', value: profile.is_online ? 'Available' : 'Offline' },
+                  { label: 'ქალაქი', value: profile.location },
+                  { label: 'ასაკი', value: profile.age ? String(profile.age) : '—' },
+                  { label: 'სტატუსი', value: profile.is_online ? 'ხელმისაწვდომი' : 'ოფლაინ' },
                 ].map((info) => (
                   <div key={info.label}>
                     <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1">{info.label}</div>
@@ -113,7 +113,7 @@ const ProfileDetail = () => {
             </div>
 
             <div className="glass-dark p-8 rounded-3xl border-white/5 mb-8">
-              <h2 className="text-2xl mb-4">Services <span className="text-luxury-gold">Offered</span></h2>
+              <h2 className="text-2xl mb-4">შეთავაზებული <span className="text-luxury-gold">სერვისები</span></h2>
               {serviceLines.length ? (
                 <ul className="grid sm:grid-cols-2 gap-3">
                   {serviceLines.map((line) => (
@@ -126,13 +126,13 @@ const ProfileDetail = () => {
                   ))}
                 </ul>
               ) : (
-                <p className="text-white/40">Services will be listed here once the provider adds them.</p>
+                <p className="text-white/40">სერვისები გამოჩნდება მას შემდეგ, რაც პროვაიდერი დაამატებს.</p>
               )}
             </div>
 
             {similarProfiles.length > 0 && (
               <div className="mt-16">
-                <h2 className="text-2xl mb-8">Similar <span className="text-luxury-gold">Companions</span></h2>
+                <h2 className="text-2xl mb-8">მსგავსი <span className="text-luxury-gold">თანმხლებები</span></h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {similarProfiles.map((p) => (
                     <ProfileCard key={p.id} profile={p} />
@@ -162,7 +162,7 @@ const ProfileDetail = () => {
                       <Star size={16} fill="currentColor" />
                       <span className="font-bold">{profile.rating}</span>
                     </div>
-                    <span className="text-[10px] text-white/40">{profile.reviews_count} Reviews</span>
+                    <span className="text-[10px] text-white/40">{profile.reviews_count} შეფასება</span>
                   </div>
                 </div>
 
@@ -176,15 +176,15 @@ const ProfileDetail = () => {
 
                 <div className="space-y-4 mb-8">
                   <div className="flex justify-between items-center py-3 border-b border-white/5">
-                    <span className="text-white/60">Rate</span>
+                    <span className="text-white/60">ტარიფი</span>
                     <span className="text-xl font-bold text-luxury-gold">{profile.price}</span>
                   </div>
                   <div className="flex justify-between items-center py-3">
-                    <span className="text-white/60">Status</span>
+                    <span className="text-white/60">სტატუსი</span>
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${profile.is_online ? 'bg-green-500 animate-pulse' : 'bg-white/30'}`} />
                       <span className={`font-bold text-xs uppercase ${profile.is_online ? 'text-green-400' : 'text-white/40'}`}>
-                        {profile.is_online ? 'Available' : 'Offline'}
+                        {profile.is_online ? 'ხელმისაწვდომი' : 'ოფლაინ'}
                       </span>
                     </div>
                   </div>
@@ -193,12 +193,12 @@ const ProfileDetail = () => {
                 <div className="flex flex-col gap-4">
                   <Link to="/messages" className="w-full">
                     <Button className="w-full py-4 text-lg flex items-center justify-center gap-2">
-                      <Calendar size={20} /> Request Booking
+                      <Calendar size={20} /> ჯავშნის მოთხოვნა
                     </Button>
                   </Link>
                   <Link to="/messages" className="w-full">
                     <Button variant="outline" className="w-full py-4 flex items-center justify-center gap-2">
-                      <MessageSquare size={20} /> Message
+                      <MessageSquare size={20} /> შეტყობინება
                     </Button>
                   </Link>
                 </div>
@@ -206,11 +206,11 @@ const ProfileDetail = () => {
                 <div className="mt-8 flex items-center justify-center gap-8 border-t border-white/5 pt-8">
                   <button type="button" className="flex flex-col items-center gap-2 text-white/40 hover:text-luxury-gold transition-colors">
                     <Heart size={20} />
-                    <span className="text-[10px] uppercase">Favorite</span>
+                    <span className="text-[10px] uppercase">რჩეული</span>
                   </button>
                   <button type="button" className="flex flex-col items-center gap-2 text-white/40 hover:text-luxury-gold transition-colors">
                     <Share2 size={20} />
-                    <span className="text-[10px] uppercase">Share</span>
+                    <span className="text-[10px] uppercase">გაზიარება</span>
                   </button>
                 </div>
               </motion.div>

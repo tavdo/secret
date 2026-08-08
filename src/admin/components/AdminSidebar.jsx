@@ -23,17 +23,17 @@ import { cn } from '../lib/cn';
 const STORAGE = 'admin-sidebar-collapsed';
 
 const links = [
-  { to: '/admin', end: true, label: 'Overview', Icon: LayoutDashboard },
-  { to: '/admin/profiles', label: 'Profiles', Icon: Contact },
-  { to: '/admin/content', label: 'Content', Icon: AlignLeft },
-  { to: '/admin/media', label: 'Media', Icon: Images },
-  { to: '/admin/analytics', label: 'Analytics', Icon: BarChart3 },
-  { to: '/admin/users', label: 'Users', Icon: Users },
-  { to: '/admin/bookings', label: 'Bookings', Icon: CalendarRange },
-  { to: '/admin/vip', label: 'VIP & tiers', Icon: Crown },
-  { to: '/admin/moderation', label: 'Moderation', Icon: ShieldAlert },
-  { to: '/admin/messaging', label: 'Messaging', Icon: MessageSquareWarning },
-  { to: '/admin/reports', label: 'Reports & Safety', Icon: Activity },
+  { to: '/admin', end: true, label: 'მიმოხილვა', Icon: LayoutDashboard },
+  { to: '/admin/profiles', label: 'პროფილები', Icon: Contact },
+  { to: '/admin/content', label: 'კონტენტი', Icon: AlignLeft },
+  { to: '/admin/media', label: 'მედია', Icon: Images },
+  { to: '/admin/analytics', label: 'ანალიტიკა', Icon: BarChart3 },
+  { to: '/admin/users', label: 'მომხმარებლები', Icon: Users },
+  { to: '/admin/bookings', label: 'ჯავშნები', Icon: CalendarRange },
+  { to: '/admin/vip', label: 'VIP და ტიერები', Icon: Crown },
+  { to: '/admin/moderation', label: 'მოდერაცია', Icon: ShieldAlert },
+  { to: '/admin/messaging', label: 'შეტყობინებები', Icon: MessageSquareWarning },
+  { to: '/admin/reports', label: 'რეპორტები', Icon: Activity },
 ];
 
 function NavRows({ collapsed, onNavigate }) {
