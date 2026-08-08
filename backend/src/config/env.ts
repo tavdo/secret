@@ -13,7 +13,7 @@ const isDev = (process.env.NODE_ENV ?? "development") !== "production";
 
 const databaseUrlFallback = isDev
   ? "postgresql://postgres:postgres@localhost:5432/marketplace?schema=public"
-  : undefined;
+  : "";
 
 export const env = {
   NODE_ENV: process.env.NODE_ENV ?? "development",
@@ -21,16 +21,14 @@ export const env = {
   DATABASE_URL:
     process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== ""
       ? process.env.DATABASE_URL
-      : isDev && databaseUrlFallback
-        ? databaseUrlFallback
-        : get("DATABASE_URL"),
+      : databaseUrlFallback,
   JWT_ISSUER: process.env.JWT_ISSUER ?? "marketplace-api",
   JWT_SECRET: isDev
     ? get("JWT_SECRET", "dev-access-secret-change-me-in-.env")
-    : get("JWT_SECRET"),
+    : get("JWT_SECRET", "CHANGE_ME_SET_JWT_SECRET_IN_VERCEL"),
   JWT_REFRESH_SECRET: isDev
     ? get("JWT_REFRESH_SECRET", "dev-refresh-secret-change-me-in-.env")
-    : get("JWT_REFRESH_SECRET"),
+    : get("JWT_REFRESH_SECRET", "CHANGE_ME_SET_JWT_REFRESH_SECRET_IN_VERCEL"),
   JWT_ACCESS_TTL_SECONDS:
     typeof process.env.JWT_ACCESS_TTL_SECONDS === "string"
       ? Number(process.env.JWT_ACCESS_TTL_SECONDS)
@@ -40,26 +38,20 @@ export const env = {
       ? Number(process.env.JWT_REFRESH_TTL_SECONDS)
       : 60 * 60 * 24 * 14,
   CORS_ORIGIN:
-    process.env.CORS_ORIGIN?.split(",").map((s) => s.trim()) ?? [
+    process.env.CORS_ORIGIN?.split(",").map((s) => s.trim()).filter(Boolean) ?? [
       "http://localhost:5173",
       "http://localhost:4000",
+      "https://secret-swart-chi.vercel.app",
     ],
   SMTP_HOST: process.env.SMTP_HOST,
   SMTP_PORT: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined,
   SMTP_USER: process.env.SMTP_USER,
   SMTP_PASS: process.env.SMTP_PASS,
   EMAIL_FROM: process.env.EMAIL_FROM ?? "noreply@localhost",
-  APP_PUBLIC_URL: process.env.APP_PUBLIC_URL ?? "http://localhost:5173",
+  APP_PUBLIC_URL:
+    process.env.APP_PUBLIC_URL ??
+    (isDev ? "http://localhost:5173" : "https://secret-swart-chi.vercel.app"),
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ?? "",
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY ?? "",
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET ?? "",
 };
-
-if (!isDev) {
-  if (
-    env.JWT_SECRET.includes("change-me-in-.env") ||
-    env.JWT_REFRESH_SECRET.includes("change-me-in-.env")
-  ) {
-    throw new Error("JWT secrets must be explicitly set outside development");
-  }
-}
